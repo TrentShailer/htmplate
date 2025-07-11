@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <htmplate:metadata />
+    <title>Register — Trent Shailer</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header></header>
+    <main>
+      <div class="column">
+        <htmplate:title icon="person-add" text="Register" />
+        <htmplate:alert type="form" />
+        <br>
+        <form id="register" name="register">
+          <htmplate:form-text-input
+            required
+            id="username"
+            label="Username"
+            minlength="4"
+            maxlength="64"
+          />
+          <htmplate:form-text-input
+            required
+            id="displayName"
+            label="Display Name"
+            minlength="4"
+            maxlength="64"
+          />
+          <htmplate:form-submit id="register.submit" />
+        </form>
+      </div>
+    </main>
+    <htmplate:footer />
+    <script type="module" src="index.js"></script>
+  </body>
+</html>
