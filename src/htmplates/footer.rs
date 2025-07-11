@@ -37,4 +37,12 @@ impl Htmplate for Footer {
 
         Ok(())
     }
+
+    fn attributes(&self) -> Vec<super::Attribute> {
+        vec![]
+    }
+
+    fn description(&self) -> &'static str {
+        "the shared footer"
+    }
 }

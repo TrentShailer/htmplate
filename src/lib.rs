@@ -6,7 +6,9 @@ mod icon;
 
 use lol_html::{Settings, element, errors::RewritingError, rewrite_str};
 
-use crate::htmplates::{HtmplateError, get_all_htmplates};
+use crate::htmplates::HtmplateError;
+
+pub use htmplates::get_all_htmplates;
 
 /// Replace the htmplates in some source HTML.
 pub fn replace_htmplates(html: &str) -> Result<String, RewritingError> {

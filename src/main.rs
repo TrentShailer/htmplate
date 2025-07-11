@@ -12,13 +12,13 @@ use std::{
 };
 
 use clap::{Parser, Subcommand};
-use htmplate::{htmplates::HtmplateError, replace_htmplates};
+use htmplate::{get_all_htmplates, htmplates::HtmplateError, replace_htmplates};
 use lol_html::errors::RewritingError;
 use notify::{RecursiveMode, Watcher, recommended_watcher};
 use ts_cli_helper::{print_fail, print_success, print_warning};
 use ts_rust_helper::{
     error::ReportResult,
-    style::{CLEAR_TERMINAL, ERASE_LINE_UP},
+    style::{BOLD, CLEAR_TERMINAL, CYAN, ERASE_LINE_UP, RESET},
 };
 
 /// Replace the `<htmplate:... />` elements in an HTML file with their contents.
@@ -49,12 +49,43 @@ pub enum Command {
         /// The file to output the templated HTML to.
         output: Option<PathBuf>,
     },
+
+    /// List the htmplates
+    List {
+        /// The htmplate to search for
+        search: Option<String>,
+    },
 }
 
 fn main() -> ReportResult<'static, ()> {
     let cli = Cli::parse();
 
     match cli.command {
+        Command::List { search } => {
+            let mut htmplates = get_all_htmplates();
+
+            if let Some(search) = search {
+                let search = search.to_lowercase();
+                htmplates.retain(|htmplate| htmplate.tag().contains(&search));
+            }
+
+            let mut stdout = stdout().lock();
+
+            for htmplate in htmplates {
+                stdout.write_all(
+                    format!(
+                        "{BOLD}{CYAN}{}{RESET}  {}\n",
+                        htmplate.tag().replace("\\", ""),
+                        htmplate.description()
+                    )
+                    .as_bytes(),
+                )?;
+                for attribute in htmplate.attributes() {
+                    stdout.write_all(format!("  {attribute}\n").as_bytes())?;
+                }
+            }
+            stdout.flush()?;
+        }
         Command::Watch { source, output } => {
             let metadata = source.metadata().map_err(CliError::read_source)?;
             if !metadata.is_file() {

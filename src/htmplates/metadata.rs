@@ -22,4 +22,12 @@ impl Htmplate for Metadata {
 
         Ok(())
     }
+
+    fn attributes(&self) -> Vec<super::Attribute> {
+        vec![]
+    }
+
+    fn description(&self) -> &'static str {
+        "common document metadata"
+    }
 }

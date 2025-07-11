@@ -3,7 +3,7 @@ use core::error::Error;
 use lol_html::html_content::{ContentType, Element};
 
 use crate::{
-    htmplates::{Htmplate, HtmplateError},
+    htmplates::{Attribute, Htmplate, HtmplateError},
     icon::get_icon_svg,
 };
 
@@ -33,5 +33,24 @@ impl Htmplate for Title {
         el.before(&content, ContentType::Html);
 
         Ok(())
+    }
+
+    fn attributes(&self) -> Vec<Attribute> {
+        vec![
+            Attribute {
+                name: "icon",
+                value_description: "an identifier for a filled ionicon https://ionic.io/ionicons",
+                required: false,
+            },
+            Attribute {
+                name: "text",
+                value_description: "the title text",
+                required: false,
+            },
+        ]
+    }
+
+    fn description(&self) -> &'static str {
+        "a document title with an optional icon"
     }
 }
