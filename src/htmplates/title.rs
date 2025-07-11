@@ -10,8 +10,11 @@ use crate::{
 /// Title htmplate
 pub struct Title;
 impl Htmplate for Title {
-    const TAG: &str = "htmplate\\:title";
-    fn replace(el: &mut Element) -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn tag(&self) -> &'static str {
+        "htmplate\\:title"
+    }
+
+    fn replace(&self, el: &mut Element) -> Result<(), Box<dyn Error + Send + Sync>> {
         let icon = if let Some(icon) = el.get_attribute("icon") {
             get_icon_svg(&icon).ok_or_else(|| HtmplateError::invalid_icon(icon))?
         } else {

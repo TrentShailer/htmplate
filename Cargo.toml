@@ -15,18 +15,11 @@ lol_html = { version = "2.5" }
 
 clap = { version = "4.5", features = ["derive"], optional = true }
 notify = { version = "8.1", optional = true }
-notify-debouncer-full = { version = "0.5", optional = true }
 ts-cli-helper = { version = "0.5", optional = true }
-ts-rust-helper = { version = "0.5", features = ["styled"], optional = true }
+ts-rust-helper = { version = "0.6", features = ["styled"], optional = true }
 
 [features]
-cli = [
-    "dep:clap",
-    "dep:notify",
-    "dep:notify-debouncer-full",
-    "dep:ts-cli-helper",
-    "dep:ts-rust-helper",
-]
+cli = ["dep:clap", "dep:notify", "dep:ts-cli-helper", "dep:ts-rust-helper"]
 
 [lints.rust]
 "missing_docs" = "warn"

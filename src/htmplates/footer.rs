@@ -10,9 +10,11 @@ use crate::{
 /// Footer htmplate
 pub struct Footer;
 impl Htmplate for Footer {
-    const TAG: &str = "htmplate\\:footer";
+    fn tag(&self) -> &'static str {
+        "htmplate\\:footer"
+    }
 
-    fn replace(el: &mut Element) -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn replace(&self, el: &mut Element) -> Result<(), Box<dyn Error + Send + Sync>> {
         let icon = get_icon_svg("logo-github")
             .ok_or_else(|| HtmplateError::invalid_icon("logo-github"))?;
 

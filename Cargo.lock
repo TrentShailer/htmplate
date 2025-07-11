@@ -211,15 +211,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
-name = "file-id"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6bc904b9bbefcadbd8e3a9fb0d464a9b979de6324c03b3c663e8994f46a5be36"
-dependencies = [
- "windows-sys 0.52.0",
-]
-
-[[package]]
 name = "foldhash"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -267,7 +258,6 @@ dependencies = [
  "clap",
  "lol_html",
  "notify",
- "notify-debouncer-full",
  "ts-cli-helper",
  "ts-rust-helper",
 ]
@@ -400,19 +390,6 @@ dependencies = [
  "notify-types",
  "walkdir",
  "windows-sys 0.60.2",
-]
-
-[[package]]
-name = "notify-debouncer-full"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2d88b1a7538054351c8258338df7c931a590513fb3745e8c15eb9ff4199b8d1"
-dependencies = [
- "file-id",
- "log",
- "notify",
- "notify-types",
- "walkdir",
 ]
 
 [[package]]
@@ -658,9 +635,9 @@ dependencies = [
 
 [[package]]
 name = "ts-rust-helper"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3265cf7dc2ec92a2b9d5477bf01140571b8a122e4849374d18ab564c4303933c"
+checksum = "e1641ea6bbd994f3a06f4ed360575664bc3a15768095e2db81ddaaf318ccd215"
 
 [[package]]
 name = "unicode-ident"
@@ -703,15 +680,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
  "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "windows-sys"
-version = "0.52.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "282be5f36a8ce781fad8c8ae18fa3f9beff57ec1b52cb3de0789201425d9a33d"
-dependencies = [
- "windows-targets 0.52.6",
 ]
 
 [[package]]
