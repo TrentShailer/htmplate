@@ -10,7 +10,7 @@ use lol_html::{Settings, element, errors::RewritingError, rewrite_str};
 pub use htmplate_element::{Attribute, FromElementError, HtmplateElement, Location};
 pub use lol_html;
 
-use crate::htmplates::{Alert, Footer, HtmplateError, Metadata, Title, replacer};
+use crate::htmplates::{Alert, Footer, FormAlert, HtmplateError, Metadata, Title, replacer};
 
 /// The details for an htmplate
 pub struct HtmplateDetails {
@@ -38,6 +38,7 @@ pub fn all_htmplate_details() -> Vec<HtmplateDetails> {
         HtmplateDetails::new::<Metadata>(),
         HtmplateDetails::new::<Footer>(),
         HtmplateDetails::new::<Alert>(),
+        HtmplateDetails::new::<FormAlert>(),
     ]
 }
 
@@ -70,6 +71,7 @@ pub fn replace_htmplates(html: &str) -> Result<String, RewritingError> {
                 element!(Metadata::tag(), replacer::<Metadata>),
                 element!(Footer::tag(), replacer::<Footer>),
                 element!(Alert::tag(), replacer::<Alert>),
+                element!(FormAlert::tag(), replacer::<FormAlert>),
                 not_found_handler,
             ],
             ..Settings::new()

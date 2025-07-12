@@ -35,7 +35,12 @@ pub fn derive_from_element(input: proc_macro::TokenStream) -> proc_macro::TokenS
     };
 
     let attributes = fields.iter().map(|field| {
-        let name_literal = &field.ident.as_ref().unwrap().to_string();
+        let name_literal = &field
+            .ident
+            .as_ref()
+            .unwrap()
+            .to_string()
+            .to_case(Case::Kebab);
         let description = get_doc(&field.attrs).expect("htmplate fields must have doc comments");
         let is_required = !is_option(&field.ty);
 
@@ -48,7 +53,12 @@ pub fn derive_from_element(input: proc_macro::TokenStream) -> proc_macro::TokenS
 
     let get_fields = fields.iter().enumerate().map(|(index, field)| {
         let name = &field.ident;
-        let name_literal = &field.ident.as_ref().unwrap().to_string();
+        let name_literal = &field
+            .ident
+            .as_ref()
+            .unwrap()
+            .to_string()
+            .to_case(Case::Kebab);
 
         let is_required = !is_option(&field.ty);
 

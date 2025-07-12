@@ -2,7 +2,7 @@ use htmplate_derive::HtmplateElement;
 
 use crate::{
     htmplates::{HtmplateError, ToHtml},
-    icon::get_icon_svg,
+    icon::Icon,
 };
 
 use crate as htmplate;
@@ -13,17 +13,12 @@ pub struct Title {
     /// the title text
     pub text: Option<String>,
     /// an identifier for a filled ionicon https://ionic.io/ionicons
-    pub icon: Option<String>,
+    pub icon: Option<Icon>,
 }
 
 impl ToHtml for Title {
     fn to_html(self) -> Result<String, HtmplateError> {
-        let icon = if let Some(icon) = self.icon {
-            get_icon_svg(&icon).ok_or_else(|| HtmplateError::invalid_icon(icon))?
-        } else {
-            ""
-        };
-
+        let icon = self.icon.map(|icon| icon.svg()).unwrap_or_default();
         let text = self.text.unwrap_or_default();
 
         let content = format!(

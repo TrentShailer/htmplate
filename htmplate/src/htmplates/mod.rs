@@ -3,12 +3,15 @@
 
 mod alert;
 mod footer;
+mod form_alert;
 mod metadata;
 mod title;
 
+use lol_html::html_content::ContentType;
+
 pub use alert::Alert;
 pub use footer::Footer;
-use lol_html::html_content::ContentType;
+pub use form_alert::FormAlert;
 pub use metadata::Metadata;
 pub use title::Title;
 
@@ -39,15 +42,11 @@ pub fn replacer<T: HtmplateElement + ToHtml>(
 #[allow(missing_docs)]
 pub enum HtmplateError {
     #[non_exhaustive]
-    InvalidIcon { icon: String },
-
-    #[non_exhaustive]
     HtmplateNotFound { tag: String },
 }
 impl core::fmt::Display for HtmplateError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match &self {
-            Self::InvalidIcon { icon, .. } => write!(f, "the icon `{icon}` does not exist"),
             Self::HtmplateNotFound { tag, .. } => write!(f, "the htmplate `{tag}` does not exist"),
         }
     }
@@ -55,13 +54,5 @@ impl core::fmt::Display for HtmplateError {
 impl core::error::Error for HtmplateError {
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         None
-    }
-}
-impl HtmplateError {
-    #[allow(missing_docs)]
-    pub fn invalid_icon<S: ToString>(icon: S) -> Self {
-        Self::InvalidIcon {
-            icon: icon.to_string(),
-        }
     }
 }

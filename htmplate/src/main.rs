@@ -87,6 +87,8 @@ fn main() -> ReportResult<'static, ()> {
 
                     if attribute.required {
                         stdout.write_all(format!("{BOLD}{RED}*{RESET}").as_bytes())?;
+                    } else {
+                        stdout.write_all(b" ")?;
                     }
 
                     stdout.write_all(

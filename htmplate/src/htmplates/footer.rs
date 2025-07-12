@@ -2,7 +2,7 @@ use htmplate_derive::HtmplateElement;
 
 use crate::{
     htmplates::{HtmplateError, ToHtml},
-    icon::get_icon_svg,
+    icon::Icon,
 };
 
 use crate as htmplate;
@@ -12,7 +12,7 @@ use crate as htmplate;
 pub struct Footer;
 impl ToHtml for Footer {
     fn to_html(self) -> Result<String, HtmplateError> {
-        let icon = get_icon_svg("logo-github").unwrap();
+        let icon = Icon::LogoGithub.svg();
 
         Ok(format!(
             r#"<footer>

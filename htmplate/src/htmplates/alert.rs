@@ -4,7 +4,7 @@ use htmplate_derive::HtmplateElement;
 
 use crate::{
     htmplates::{HtmplateError, ToHtml},
-    icon::get_icon_svg,
+    icon::Icon,
 };
 
 use crate as htmplate;
@@ -44,11 +44,11 @@ pub struct Alert {
 impl ToHtml for Alert {
     fn to_html(self) -> Result<String, HtmplateError> {
         let icon = match &self.status {
-            AlertStyle::Error => get_icon_svg("alert-circle").unwrap(),
-            AlertStyle::Warning => get_icon_svg("warning").unwrap(),
-            AlertStyle::Success => get_icon_svg("checkmark-circle").unwrap(),
-            AlertStyle::Info => get_icon_svg("help-circle").unwrap(),
-            AlertStyle::Basic => get_icon_svg("information-circle").unwrap(),
+            AlertStyle::Error => Icon::AlertCircle.svg(),
+            AlertStyle::Warning => Icon::Warning.svg(),
+            AlertStyle::Success => Icon::CheckmarkCircle.svg(),
+            AlertStyle::Info => Icon::HelpCircle.svg(),
+            AlertStyle::Basic => Icon::InformationCircle.svg(),
         };
 
         let class = match &self.status {
