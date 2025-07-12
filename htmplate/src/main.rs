@@ -193,8 +193,28 @@ fn main() -> ReportResult<'static, ()> {
             if !metadata.is_file() {
                 return Err(CliError::SourceIsNotAFile.into());
             }
-            let html = fs::read_to_string(source).map_err(CliError::read_source)?;
-            template_html(&html, output.as_deref())?;
+            let html = fs::read_to_string(&source).map_err(CliError::read_source)?;
+
+            if let Err(mut root) = template_html(&html, output.as_deref()) {
+                let CliError::RewriteError {
+                    source: rewriting_error,
+                } = &mut root
+                else {
+                    return Err(root.into());
+                };
+
+                let RewritingError::ContentHandlerError(any_error) = rewriting_error else {
+                    return Err(root.into());
+                };
+
+                if let Some(error) = any_error.downcast_mut::<FromElementError>() {
+                    error.element_location = error
+                        .element_location
+                        .as_file_position(html.as_bytes(), source.clone());
+                }
+
+                return Err(root.into());
+            }
         }
     }
 
@@ -414,7 +434,7 @@ impl core::fmt::Display for CliError {
         match &self {
             Self::ReadSource { .. } => write!(f, "could not read source file"),
             Self::OpenOutput { .. } => write!(f, "could not open output"),
-            Self::RewriteError { .. } => write!(f, "could not replace htmplates"),
+            Self::RewriteError { .. } => write!(f, "could not parse an htmplate"),
             Self::WatchError { .. } => write!(f, "error while watching source file"),
             Self::SourceIsNotAFile { .. } => write!(f, "source is not a file"),
             Self::OutputIsNotAFile { .. } => write!(f, "output is not a file"),
