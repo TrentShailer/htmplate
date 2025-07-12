@@ -22,7 +22,7 @@ impl ToHtml for Title {
         let text = self.text.unwrap_or_default();
 
         let content = format!(
-            r#"<hgroup style="display: flex; flex-direction: row; align-items: center; gap: 1rem">
+            r#"<hgroup class="title">
                 {icon}<h1>{text}</h1>
             </hgroup>"#
         );
