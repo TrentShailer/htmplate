@@ -12,13 +12,15 @@ use std::{
 };
 
 use clap::{Parser, Subcommand};
-use htmplate::{get_all_htmplates, htmplates::HtmplateError, replace_htmplates};
+use htmplate::{
+    FromElementError, all_htmplate_details, htmplates::HtmplateError, replace_htmplates,
+};
 use lol_html::errors::RewritingError;
 use notify::{RecursiveMode, Watcher, recommended_watcher};
 use ts_cli_helper::{print_fail, print_success, print_warning};
 use ts_rust_helper::{
     error::ReportResult,
-    style::{BOLD, CLEAR_TERMINAL, CYAN, ERASE_LINE_UP, RESET},
+    style::{BOLD, CLEAR_TERMINAL, CYAN, ERASE_LINE_UP, RED, RESET},
 };
 
 /// Replace the `<htmplate:... />` elements in an HTML file with their contents.
@@ -62,11 +64,11 @@ fn main() -> ReportResult<'static, ()> {
 
     match cli.command {
         Command::List { search } => {
-            let mut htmplates = get_all_htmplates();
+            let mut htmplates = all_htmplate_details();
 
             if let Some(search) = search {
                 let search = search.to_lowercase();
-                htmplates.retain(|htmplate| htmplate.tag().contains(&search));
+                htmplates.retain(|htmplate| htmplate.tag.contains(&search));
             }
 
             let mut stdout = stdout().lock();
@@ -75,13 +77,25 @@ fn main() -> ReportResult<'static, ()> {
                 stdout.write_all(
                     format!(
                         "{BOLD}{CYAN}{}{RESET}  {}\n",
-                        htmplate.tag().replace("\\", ""),
-                        htmplate.description()
+                        htmplate.tag.replace("\\", ""),
+                        htmplate.description
                     )
                     .as_bytes(),
                 )?;
-                for attribute in htmplate.attributes() {
-                    stdout.write_all(format!("  {attribute}\n").as_bytes())?;
+                for attribute in htmplate.attributes {
+                    stdout.write_all(b"  ")?;
+
+                    if attribute.required {
+                        stdout.write_all(format!("{BOLD}{RED}*{RESET}").as_bytes())?;
+                    }
+
+                    stdout.write_all(
+                        format!(
+                            "{BOLD}[{}]:{RESET} {}\n",
+                            attribute.name, attribute.description
+                        )
+                        .as_bytes(),
+                    )?;
                 }
             }
             stdout.flush()?;
@@ -132,24 +146,34 @@ fn main() -> ReportResult<'static, ()> {
                 }
 
                 y_position = 0;
-
-                let lines_written = match template_file(&source, output.as_deref()) {
+                let html = fs::read_to_string(&source).map_err(CliError::read_source)?;
+                let lines_written = match template_html(&html, output.as_deref()) {
                     Ok(lines) => lines,
-                    Err(error) => {
-                        let CliError::RewriteError { source } = &error else {
+                    Err(mut error) => {
+                        let CliError::RewriteError {
+                            source: rewriting_error,
+                        } = &mut error
+                        else {
                             return Err(error.into());
                         };
 
-                        let RewritingError::ContentHandlerError(any_error) = source else {
+                        let RewritingError::ContentHandlerError(any_error) = rewriting_error else {
                             return Err(error.into());
                         };
 
-                        let Some(error) = any_error.downcast_ref::<HtmplateError>() else {
+                        if let Some(error) = any_error.downcast_ref::<HtmplateError>() {
+                            print_fail(&error.to_string(), 0);
+                            1
+                        } else if let Some(error) = any_error.downcast_mut::<FromElementError>() {
+                            error.element_location = error
+                                .element_location
+                                .as_file_position(html.as_bytes(), source.clone());
+                            let display = error.to_string();
+                            print_fail(&display, 0);
+                            display.lines().count() + 1
+                        } else {
                             return Err(error.into());
-                        };
-
-                        print_fail(&error.to_string(), 0);
-                        1
+                        }
                     }
                 };
                 y_position += lines_written;
@@ -169,19 +193,17 @@ fn main() -> ReportResult<'static, ()> {
             if !metadata.is_file() {
                 return Err(CliError::SourceIsNotAFile.into());
             }
-
-            template_file(&source, output.as_deref())?;
+            let html = fs::read_to_string(source).map_err(CliError::read_source)?;
+            template_html(&html, output.as_deref())?;
         }
     }
 
     Ok(())
 }
 
-fn template_file(source: &Path, output: Option<&Path>) -> Result<usize, CliError> {
-    let html = fs::read_to_string(source).map_err(CliError::read_source)?;
-
+fn template_html(html: &str, output: Option<&Path>) -> Result<usize, CliError> {
     let start = Instant::now();
-    let templated_html = replace_htmplates(&html).map_err(CliError::rewrite_error)?;
+    let templated_html = replace_htmplates(html).map_err(CliError::rewrite_error)?;
     let template_duration = start.elapsed();
 
     let sink = get_stdio_output(output)?;
@@ -212,11 +234,7 @@ fn template_file(source: &Path, output: Option<&Path>) -> Result<usize, CliError
     }
 
     print_success(
-        &format!(
-            "Templated `{}` in {}µs",
-            source.to_string_lossy(),
-            template_duration.as_micros()
-        ),
+        &format!("Templated HTML in {}µs", template_duration.as_micros()),
         0,
     );
 

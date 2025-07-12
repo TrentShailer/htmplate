@@ -1,0 +1,23 @@
+[package]
+name = "htmplate-derive"
+version = "0.1.0"
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+convert_case = { version = "0.8" }
+proc-macro2 = { version = "1" }
+quote = { version = "1" }
+syn = { version = "2", features = ["extra-traits"] }
+
+[dev-dependencies]
+htmplate = { path = "../htmplate" }
+
+[lints]
+workspace = true

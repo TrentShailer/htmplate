@@ -1,0 +1,27 @@
+[package]
+name = "htmplate"
+version = "0.1.0"
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "htmplate"
+required-features = ["cli"]
+
+[dependencies]
+htmplate-derive = { path = "../htmplate-derive" }
+lol_html = { version = "2.5" }
+ts-rust-helper = { version = "0.6", features = ["styled"] }
+
+clap = { version = "4.5", features = ["derive"], optional = true }
+notify = { version = "8.1", optional = true }
+ts-cli-helper = { version = "0.5", optional = true }
+
+[features]
+cli = ["dep:clap", "dep:notify", "dep:ts-cli-helper"]
+
+[lints]
+workspace = true
