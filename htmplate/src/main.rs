@@ -13,14 +13,15 @@ use std::{
 
 use clap::{Parser, Subcommand};
 use htmplate::{
-    FromElementError, all_htmplate_details, htmplates::HtmplateError, replace_htmplates,
+    FromElementError, HtmplateDetails, all_htmplate_details, htmplates::HtmplateError,
+    replace_htmplates,
 };
 use lol_html::errors::RewritingError;
 use notify::{RecursiveMode, Watcher, recommended_watcher};
 use ts_cli_helper::{print_fail, print_success, print_warning};
 use ts_rust_helper::{
     error::ReportResult,
-    style::{BOLD, CLEAR_TERMINAL, CYAN, ERASE_LINE_UP, RED, RESET},
+    style::{BLUE, CLEAR_TERMINAL, DIM, ERASE_LINE_UP, RED, RESET},
 };
 
 /// Replace the `<htmplate:... />` elements in an HTML file with their contents.
@@ -59,6 +60,47 @@ pub enum Command {
     },
 }
 
+fn write_htmplate<W: Write>(details: &HtmplateDetails, f: &mut W) -> io::Result<()> {
+    writeln!(
+        f,
+        "<{BLUE}{}{RESET} /> {DIM}{}{RESET}",
+        details.tag.replace("\\", ""),
+        details.description
+    )?;
+
+    let attribute_width = details
+        .attributes
+        .iter()
+        .map(|v| v.name.len())
+        .max()
+        .unwrap_or_default();
+
+    for attribute in &details.attributes {
+        // Write padding
+        write!(
+            f,
+            "{}",
+            " ".repeat(attribute_width - attribute.name.len() + 2)
+        )?;
+
+        if attribute.required {
+            write!(f, "{RED}*{RESET}")?;
+        } else {
+            write!(f, " ")?;
+        }
+
+        writeln!(
+            f,
+            "[{}]{DIM}: {}{RESET}",
+            attribute.name, attribute.description
+        )?;
+    }
+
+    writeln!(f)?;
+
+    Ok(())
+}
+
 fn main() -> ReportResult<'static, ()> {
     let cli = Cli::parse();
 
@@ -74,31 +116,7 @@ fn main() -> ReportResult<'static, ()> {
             let mut stdout = stdout().lock();
 
             for htmplate in htmplates {
-                stdout.write_all(
-                    format!(
-                        "{BOLD}{CYAN}{}{RESET}  {}\n",
-                        htmplate.tag.replace("\\", ""),
-                        htmplate.description
-                    )
-                    .as_bytes(),
-                )?;
-                for attribute in htmplate.attributes {
-                    stdout.write_all(b"  ")?;
-
-                    if attribute.required {
-                        stdout.write_all(format!("{BOLD}{RED}*{RESET}").as_bytes())?;
-                    } else {
-                        stdout.write_all(b" ")?;
-                    }
-
-                    stdout.write_all(
-                        format!(
-                            "{BOLD}[{}]:{RESET} {}\n",
-                            attribute.name, attribute.description
-                        )
-                        .as_bytes(),
-                    )?;
-                }
+                write_htmplate(&htmplate, &mut stdout)?;
             }
             stdout.flush()?;
         }

@@ -7,10 +7,10 @@ use crate::{self as htmplate, htmplates::ToHtml};
 pub struct FormTextInput {
     /// the id of the input
     pub id: String,
-    /// is the input required
-    pub required: bool,
     /// the input label contents
     pub label: String,
+    /// is the input required
+    pub required: Option<bool>,
     /// the minimum number of characters
     pub min_length: Option<usize>,
     /// the maximum number of characters
@@ -27,14 +27,16 @@ impl ToHtml for FormTextInput {
             max_length,
         } = self;
 
+        let is_required = required.is_some_and(|required| required);
+
         let aria_label = format!("{label} input");
-        let required_marker = if required {
+        let required_marker = if is_required {
             "<strong><span>*</span></strong>"
         } else {
             ""
         };
 
-        let required_attribute = if required { "required" } else { "" };
+        let required_attribute = if is_required { "required" } else { "" };
         let min_length_attribute = min_length
             .map(|length| format!("minlength=\"{length}\""))
             .unwrap_or_default();
