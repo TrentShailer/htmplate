@@ -4,6 +4,8 @@
 mod alert;
 mod footer;
 mod form_alert;
+mod form_submit;
+mod form_text_input;
 mod metadata;
 mod title;
 
@@ -12,6 +14,8 @@ use lol_html::html_content::ContentType;
 pub use alert::Alert;
 pub use footer::Footer;
 pub use form_alert::FormAlert;
+pub use form_submit::FormSubmit;
+pub use form_text_input::FormTextInput;
 pub use metadata::Metadata;
 pub use title::Title;
 
