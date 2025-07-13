@@ -6,6 +6,7 @@ mod footer;
 mod form_alert;
 mod form_submit;
 mod form_text_input;
+mod icon;
 mod metadata;
 mod title;
 
@@ -18,6 +19,7 @@ pub use footer::Footer;
 pub use form_alert::FormAlert;
 pub use form_submit::FormSubmit;
 pub use form_text_input::FormTextInput;
+pub use icon::Icon;
 pub use metadata::Metadata;
 pub use title::Title;
 

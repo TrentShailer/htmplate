@@ -14,7 +14,7 @@ pub use htmplate_element::{Attribute, FromElementError, HtmplateElement, Locatio
 pub use lol_html;
 
 use crate::htmplates::{
-    Alert, Footer, FormAlert, FormSubmit, FormTextInput, Metadata, Title, replacer,
+    Alert, Footer, FormAlert, FormSubmit, FormTextInput, Icon, Metadata, Title, replacer,
 };
 
 /// The details for an htmplate
@@ -46,6 +46,7 @@ pub fn all_htmplate_details() -> Vec<HtmplateDetails> {
         HtmplateDetails::new::<FormAlert>(),
         HtmplateDetails::new::<FormTextInput>(),
         HtmplateDetails::new::<FormSubmit>(),
+        HtmplateDetails::new::<Icon>(),
     ]
 }
 
@@ -85,6 +86,7 @@ pub fn replace_htmplates(
                     path_from_output_to_assets
                 )),
                 element!(Title::tag(), |el| replacer::<Title>(el, html, html_path)),
+                element!(Icon::tag(), |el| replacer::<Icon>(el, html, html_path)),
                 element!(Footer::tag(), |el| replacer::<Footer>(el, html, html_path)),
                 element!(Alert::tag(), |el| replacer::<Alert>(el, html, html_path)),
                 element!(FormAlert::tag(), |el| replacer::<FormAlert>(
