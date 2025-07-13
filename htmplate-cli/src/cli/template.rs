@@ -48,11 +48,12 @@ pub fn template_file(
     }
 
     // Get asset directory
+    let output_directory = output.parent().unwrap();
     let asset_directory = asset_directory
         .map(Path::to_path_buf)
-        .unwrap_or_else(|| output.parent().unwrap().join("lib"));
+        .unwrap_or_else(|| output_directory.join("lib"));
     let asset_file = File::Assets(asset_directory.clone());
-    let path_from_output_to_assets = diff_paths(&asset_directory, output).unwrap();
+    let path_from_output_to_assets = diff_paths(&asset_directory, output_directory).unwrap();
 
     // Get source contents
     let html = fs::read_to_string(source)

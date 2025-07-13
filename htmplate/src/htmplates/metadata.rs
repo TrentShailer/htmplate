@@ -26,8 +26,8 @@ impl Metadata {
             <meta name="author" content="Trent Shailer">
             <link rel="icon" type="image/x-icon" href="{}">
             <link rel="stylesheet" href="{}">"#,
-            icon_path.to_string_lossy(),
-            css_path.to_string_lossy()
+            icon_path.to_string_lossy().replace("\\", "/"),
+            css_path.to_string_lossy().replace("\\", "/")
         ))
     }
 
