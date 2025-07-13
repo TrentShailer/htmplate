@@ -9,6 +9,8 @@ mod form_text_input;
 mod metadata;
 mod title;
 
+use std::path::Path;
+
 use lol_html::html_content::ContentType;
 
 pub use alert::Alert;
@@ -30,8 +32,10 @@ pub trait ToHtml {
 /// Create a standard replacer for an htmplate.
 pub fn replacer<T: HtmplateElement + ToHtml>(
     el: &mut lol_html::html_content::Element,
+    html: &str,
+    file_path: &Path,
 ) -> Result<(), Box<dyn core::error::Error + Send + Sync + 'static>> {
-    let htmplate = T::from_element(el)?;
+    let htmplate = T::from_element(el, html, file_path)?;
     let html = htmplate.to_html()?;
 
     el.start_tag().remove();
@@ -44,15 +48,10 @@ pub fn replacer<T: HtmplateElement + ToHtml>(
 #[derive(Debug)]
 #[non_exhaustive]
 #[allow(missing_docs)]
-pub enum HtmplateError {
-    #[non_exhaustive]
-    HtmplateNotFound { tag: String },
-}
+pub enum HtmplateError {}
 impl core::fmt::Display for HtmplateError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match &self {
-            Self::HtmplateNotFound { tag, .. } => write!(f, "the htmplate `{tag}` does not exist"),
-        }
+        write!(f, "error converting htmplate to HTML")
     }
 }
 impl core::error::Error for HtmplateError {

@@ -11,4 +11,4 @@ A CLI to template HTML components in my projects.
 
 ## Installing
 
-`cargo install --locked --features cli --path htmplate`
+`cargo install --locked --path htmplate-cli`

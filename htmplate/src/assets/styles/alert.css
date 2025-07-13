@@ -1,0 +1,42 @@
+.alert {
+  background-color: rgba(var(--surface2-rgb), 0.2);
+  color: var(--text);
+  fill: var(--text);
+  stroke: var(--text);
+
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.alert > div {
+  display: flex;
+}
+
+.alert.error {
+  background-color: rgba(var(--red-rgb), 0.2);
+  fill: var(--red);
+  stroke: var(--red);
+}
+.alert.warning {
+  background-color: rgba(var(--yellow-rgb), 0.2);
+  fill: var(--yellow);
+  stroke: var(--yellow);
+}
+.alert.success {
+  background-color: rgba(var(--green-rgb), 0.2);
+  fill: var(--green);
+  stroke: var(--green);
+}
+.alert.info {
+  background-color: rgba(var(--mauve-rgb), 0.2);
+  fill: var(--mauve);
+  stroke: var(--mauve);
+}
+
+.alert svg {
+  height: 1.5rem;
+  padding-left: 0.1rem;
+  padding-top: 0.1rem;
+}

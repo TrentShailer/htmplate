@@ -1,9 +1,13 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// A trait marking a struct as an htmplate.
 pub trait HtmplateElement: Sized {
     /// Try convert an element to this htmplate.
-    fn from_element(el: &lol_html::html_content::Element) -> Result<Self, FromElementError>;
+    fn from_element(
+        el: &lol_html::html_content::Element,
+        html: &str,
+        path: &Path,
+    ) -> Result<Self, FromElementError>;
 
     /// Get the template's attributes
     fn attributes() -> Vec<Attribute>;
@@ -28,32 +32,23 @@ pub struct Attribute {
 
 #[derive(Debug, Clone)]
 /// A location in a file.
-pub enum Location {
-    /// A given byte index.
-    Byte(usize),
-    /// A position in the file at the path.
-    FilePosition {
-        /// The path to the file.
-        path: PathBuf,
-        /// The line number.
-        line: usize,
-        /// The column
-        column: usize,
-    },
+pub struct Location {
+    /// The path to the file.
+    path: PathBuf,
+    /// The line number.
+    line: usize,
+    /// The column
+    column: usize,
 }
 impl Location {
     /// Convert a byte position to a file position.
-    pub fn as_file_position(&self, raw_file: &[u8], path: PathBuf) -> Self {
-        let Self::Byte(index) = self else {
-            return self.clone();
-        };
-
+    pub fn from_byte_index(index: usize, raw_file: &[u8], path: &Path) -> Self {
         let mut consumed = 0;
         let mut line = 1;
         let mut column = 1;
 
         let mut iter = raw_file.iter();
-        while consumed < *index
+        while consumed < index
             && let Some(byte) = iter.next()
         {
             consumed += 1;
@@ -66,17 +61,22 @@ impl Location {
             }
         }
 
-        Self::FilePosition { path, line, column }
+        Self {
+            path: path.to_path_buf(),
+            line,
+            column,
+        }
     }
 }
 impl core::fmt::Display for Location {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match &self {
-            Self::Byte(index) => write!(f, "byte {index}"),
-            Self::FilePosition { path, line, column } => {
-                write!(f, "{}:{}:{}", path.to_string_lossy(), line, column)
-            }
-        }
+        write!(
+            f,
+            "{}:{}:{}",
+            self.path.to_string_lossy(),
+            self.line,
+            self.column
+        )
     }
 }
 

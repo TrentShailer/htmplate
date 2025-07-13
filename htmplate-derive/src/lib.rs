@@ -123,14 +123,14 @@ pub fn derive_from_element(input: proc_macro::TokenStream) -> proc_macro::TokenS
                 ]
             }
 
-            fn from_element(el: &htmplate::lol_html::html_content::Element) -> Result<Self, htmplate::FromElementError> {
+            fn from_element(el: &htmplate::lol_html::html_content::Element, html: &str, path: &std::path::Path) -> Result<Self, htmplate::FromElementError> {
                 let attributes = Self::attributes();
 
                 let mut error = htmplate::FromElementError {
                     missing_attributes: vec![],
                     invalid_attributes: vec![],
                     element_tag: el.tag_name(),
-                    element_location: htmplate::Location::Byte(el.source_location().bytes().start),
+                    element_location: htmplate::Location::from_byte_index(el.source_location().bytes().start, html.as_bytes(), path),
                 };
 
                 #( #get_fields )*
