@@ -90,3 +90,14 @@ pre {
   padding: 1rem;
   overflow-x: auto;
 }
+
+.title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.title > svg {
+  height: 2.5rem;
+}
