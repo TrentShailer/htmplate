@@ -4,7 +4,7 @@ use std::{path::Path, sync::mpsc::channel, time::Instant};
 use htmplate::ReplaceHtmplateError;
 use notify::{RecursiveMode, Watcher, recommended_watcher};
 use ts_cli_helper::{print_fail, print_success};
-use ts_rust_helper::error::ErrorStackStyle;
+use ts_rust_helper::{error::ErrorStackStyle, style::*};
 
 use crate::cli::{
     Command,
@@ -57,6 +57,11 @@ fn report_result(
     event_count: usize,
     y: &mut usize,
 ) -> Result<(), TemplateError> {
+    while *y > 0 {
+        print!("{ERASE_LINE_UP}");
+        *y -= 1;
+    }
+
     match result {
         Ok(_) => {
             print_success(format_args!(
@@ -75,7 +80,7 @@ fn report_result(
                     ));
 
                     let report = error.to_string();
-                    println!("{report}");
+                    print!("{report}");
                     *y += report.lines().count() + 1
                 }
 
@@ -89,7 +94,7 @@ fn report_result(
                         .display(&source)
                         .unwrap_or_default();
 
-                    println!("{report}");
+                    print!("{report}");
 
                     *y += report.lines().count() + 1
                 }
