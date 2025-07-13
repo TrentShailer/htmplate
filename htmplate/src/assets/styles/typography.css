@@ -58,6 +58,9 @@ body {
     var(--font-text), sans-serif;
   font-weight: 400;
   line-height: 1.7;
+  color: var(--text);
+  fill: var(--text);
+  stroke: var(--text);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -65,16 +68,6 @@ h1, h2, h3, h4, h5, h6 {
     var(--font-headings), var(--font-text), sans-serif;
   font-weight: 500;
   line-height: 1.2;
-}
-
-.title {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1rem;
-}
-.title svg {
-  height: 2.5rem;
 }
 
 b,

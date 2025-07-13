@@ -1,3 +1,42 @@
 .column {
-  width: min(48rem, 90vw);
+  width: min(38rem, 100%);
+}
+
+footer {
+  height: 2rem;
+  padding: 0.5rem;
+}
+
+footer a.button {
+  color: var(--overlay1) !important;
+  fill: var(--overlay1) !important;
+  stroke: var(--overlay1) !important;
+}
+
+footer > a.button:hover {
+  color: var(--subtext1) !important;
+  fill: var(--subtext1) !important;
+  stroke: var(--subtext1) !important;
+}
+
+header {
+  height: 2rem;
+  padding: 0.5rem;
+}
+
+main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
