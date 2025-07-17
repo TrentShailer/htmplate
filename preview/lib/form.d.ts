@@ -1,6 +1,3 @@
-// deno-lint-ignore-file
-// deno-fmt-ignore-file
-// @ts-nocheck
 import { Problem } from "./fetch.d.ts";
 export declare class FormError {
     element: HTMLElement;
@@ -27,7 +24,7 @@ export declare class Form {
     submitButton: HTMLButtonElement;
     inputs: Map<string, Input>;
     constructor(formId: string, inputIds: string[]);
-    clearError(): void;
+    clearErrors(): void;
     lock(): void;
     unlock(): void;
     setInputErrors(problems: Problem[] | null): void;

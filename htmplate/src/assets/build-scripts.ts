@@ -41,9 +41,8 @@ function compile_typescript(source_path: string, output_directory: string) {
     mangle: { keep_fargs: true },
   }).code;
 
-  const dtsHeader = denoComments.join("\n");
   const dtsBody = dts.outputText.replaceAll('.ts"', '.d.ts"');
-  const outputDts = `${dtsHeader}\n${dtsBody}`;
+  const outputDts = `${dtsBody}`;
 
   Deno.writeTextFileSync(path.join(output_directory, `${stem}.js`), outputJs);
   Deno.writeTextFileSync(path.join(output_directory, `${stem}.d.ts`), outputDts);

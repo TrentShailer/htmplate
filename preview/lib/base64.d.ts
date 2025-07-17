@@ -1,6 +1,3 @@
-// deno-lint-ignore-file
-// deno-fmt-ignore-file
-// @ts-nocheck
 declare global {
     interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
         toBase64(options?: {
