@@ -94,7 +94,7 @@ export class Form {
     this.inputs = inputs;
   }
 
-  clearError() {
+  clearErrors() {
     this.formError.clearError();
     for (const input of this.inputs.values()) {
       input.clearError();
