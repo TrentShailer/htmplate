@@ -64,7 +64,7 @@ pub fn derive_from_element(input: proc_macro::TokenStream) -> proc_macro::TokenS
 
         let none_action = if is_required {
             quote! {
-                error.missing_attributes.push(attributes[#index]);
+                missing_attributes.push(attributes[#index]);
             }
         } else {
             TokenStream::new()
@@ -75,7 +75,7 @@ pub fn derive_from_element(input: proc_macro::TokenStream) -> proc_macro::TokenS
                 Some(value) => match value.parse() {
                     Ok(value) => Some(value),
                     Err(_) => {
-                        error.invalid_attributes.push(attributes[#index]);
+                        invalid_attributes.push(attributes[#index]);
                         None
                     }
                 },
@@ -126,16 +126,18 @@ pub fn derive_from_element(input: proc_macro::TokenStream) -> proc_macro::TokenS
             fn from_element(el: &htmplate::lol_html::html_content::Element, html: &str, path: &std::path::Path) -> Result<Self, htmplate::FromElementError> {
                 let attributes = Self::attributes();
 
-                let mut error = htmplate::FromElementError {
-                    missing_attributes: vec![],
-                    invalid_attributes: vec![],
-                    element_tag: el.tag_name(),
-                    element_location: htmplate::Location::from_byte_index(el.source_location().bytes().start, html.as_bytes(), path),
-                };
+                let mut missing_attributes = vec![];
+                let mut invalid_attributes = vec![];
 
                 #( #get_fields )*
 
-                if !error.missing_attributes.is_empty() || !error.invalid_attributes.is_empty() {
+                if !missing_attributes.is_empty() || !invalid_attributes.is_empty() {
+                    let mut error = htmplate::FromElementError {
+                        missing_attributes: missing_attributes.into_boxed_slice(),
+                        invalid_attributes: invalid_attributes.into_boxed_slice(),
+                        element_tag: el.tag_name(),
+                        element_location: htmplate::Location::from_byte_index(el.source_location().bytes().start, html.as_bytes(), path),
+                    };
                     return Err(error);
                 }
 

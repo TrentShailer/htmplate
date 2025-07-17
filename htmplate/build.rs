@@ -17,7 +17,7 @@ fn main() {
             .arg("--bundle")
             .arg("--minify")
             .arg("--output-file")
-            .arg(Path::new(&out_dir).join("lib.min.css"))
+            .arg(Path::new(&out_dir).join("style.min.css"))
             .arg(assets_root.join("styles").join("lib.css"))
             .spawn()
             .unwrap();
@@ -31,11 +31,11 @@ fn main() {
         let mut child = Command::new("deno")
             .arg("run")
             .arg("-A")
-            .arg(assets_root.join("scripts").join("build.ts"))
+            .arg(assets_root.join("build-scripts.ts"))
             .arg("--outdir")
             .arg(Path::new(&out_dir))
-            .arg("--entryPoint")
-            .arg(assets_root.join("scripts").join("lib.ts"))
+            .arg("--indir")
+            .arg(assets_root.join("scripts"))
             .spawn()
             .unwrap();
 

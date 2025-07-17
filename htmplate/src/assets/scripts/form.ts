@@ -1,126 +1,164 @@
-export function lockForm(
-  inputIds: string[],
-  submitId: string,
-  formErrorId: string,
-): Map<string, string> {
-  // Disable submit
-  const submitElement = document.getElementById(submitId);
-  if (submitElement && submitElement instanceof HTMLButtonElement) {
-    submitElement.disabled = true;
+import { Problem } from "./fetch.ts";
+
+export class FormError {
+  element: HTMLElement;
+  contents: HTMLElement;
+
+  constructor(formId: string) {
+    this.element = getElementById<HTMLElement>(`${formId}/error`, HTMLElement);
+    this.contents = getElementById<HTMLElement>(`${formId}/error/content`, HTMLElement);
   }
 
-  // Disable inputs and collect values
-  const values = new Map();
-  for (const inputId of inputIds) {
-    const element = document.getElementById(inputId);
-    if (element && element instanceof HTMLInputElement) {
-      element.disabled = true;
-      element.ariaInvalid = "false";
-      values.set(inputId, element.value);
+  clearError() {
+    this.element.classList.add("collapse");
+    this.element.ariaHidden = "true";
+    this.contents.textContent = "";
+  }
+
+  addError(error: string) {
+    if (this.contents.textContent === "") {
+      this.setError(`Invalid form: ${error}`);
+      return;
     }
 
-    // Reset error field
-    const errorElement = document.getElementById(inputId + ".error");
-    if (errorElement) {
-      errorElement.classList.add("hidden");
-      errorElement.ariaHidden = "true";
-      errorElement.textContent = "!";
-    }
+    this.contents.textContent += `, ${error}`;
   }
 
-  // Reset form error
-  const formError = document.getElementById(formErrorId);
-  if (formError) {
-    formError.classList.add("collapse");
-    formError.ariaHidden = "true";
+  setError(error: string) {
+    this.element.classList.remove("collapse");
+    this.element.ariaHidden = "false";
+    this.contents.textContent = error;
   }
-
-  // Reset form error content
-  const formErrorContent = document.getElementById(formErrorId + ".content");
-  if (formErrorContent) {
-    formErrorContent.textContent = "";
-  }
-
-  return values;
 }
 
-export function setFormInputErrors(
-  inputIdMap: Map<string, string>,
-  formErrorId: string,
-  problems: { pointer: string | null; detail: string | null }[] | null,
-  formErrorPrefix: string,
-) {
-  if (!problems || problems.length === 0) {
-    setFormError(formErrorId, "form is invalid");
-    return;
+export class Input {
+  input: HTMLInputElement;
+  error: HTMLElement;
+
+  constructor(formId: string, inputId: string) {
+    this.input = getElementById<HTMLInputElement>(`${formId}${inputId}/input`, HTMLInputElement);
+    this.error = getElementById<HTMLElement>(`${formId}${inputId}/error`, HTMLElement);
   }
 
-  for (const problem of problems) {
-    let errorElement = null;
-    let inputElement = null;
-    let message = " at least one field is invalid.";
+  getValue(): string {
+    return this.input.value;
+  }
 
-    if (problem.pointer) {
-      const inputId = inputIdMap.get(problem.pointer);
-      if (inputId) {
-        inputElement = document.getElementById(inputId);
-        errorElement = document.getElementById(inputId + ".error");
-        message = "Invalid value";
+  lock() {
+    this.input.disabled = true;
+  }
+
+  unlock() {
+    this.input.disabled = false;
+  }
+
+  clearError() {
+    this.input.setCustomValidity("");
+    this.error.classList.add("hidden");
+    this.error.ariaHidden = "true";
+    this.error.textContent = "!";
+  }
+
+  addError(error: string) {
+    if (this.error.textContent === "!") {
+      this.setError(`Invalid value: ${error}`);
+      return;
+    }
+    this.error.textContent += `, ${error}`;
+    this.input.setCustomValidity(this.error.textContent ?? "Invalid value");
+  }
+
+  setError(error: string) {
+    this.input.setCustomValidity(error);
+    this.error.classList.remove("hidden");
+    this.error.ariaHidden = "false";
+    this.error.textContent = error;
+  }
+}
+
+export class Form {
+  form: HTMLFormElement;
+  formError: FormError;
+  submitButton: HTMLButtonElement;
+  inputs: Map<string, Input>;
+
+  constructor(formId: string, inputIds: string[]) {
+    this.form = getElementById<HTMLFormElement>(formId, HTMLFormElement);
+    this.formError = new FormError(formId);
+    this.submitButton = getElementById<HTMLButtonElement>(`${formId}/submit`, HTMLButtonElement);
+
+    const inputs = new Map<string, Input>();
+    for (const inputId of inputIds) {
+      inputs.set(inputId, new Input(formId, inputId));
+    }
+    this.inputs = inputs;
+  }
+
+  clearError() {
+    this.formError.clearError();
+    for (const input of this.inputs.values()) {
+      input.clearError();
+    }
+  }
+
+  lock() {
+    this.submitButton.disabled = true;
+    for (const input of this.inputs.values()) {
+      input.lock();
+    }
+  }
+
+  unlock() {
+    this.submitButton.disabled = false;
+    for (const input of this.inputs.values()) {
+      input.unlock();
+    }
+  }
+
+  setInputErrors(problems: Problem[] | null) {
+    if (!problems || problems.length === 0) {
+      this.formError.addError("an unknown field is invalid");
+      return;
+    }
+
+    for (const problem of problems) {
+      let input: Input | null = null;
+      if (problem.pointer) {
+        input = this.inputs.get(problem.pointer) ?? null;
+      }
+
+      if (input && problem.detail) {
+        input.addError(problem.detail);
+      } else if (input && !problem.detail) {
+        input.addError("unknown reason");
+      } else if (!input && problem.detail) {
+        this.formError.addError(problem.detail);
+      } else {
+        this.formError.addError("an unknown field is invalid");
       }
     }
+  }
 
-    if (problem.detail) {
-      message = problem.detail;
+  getValues(): Map<string, string> {
+    const map = new Map();
+    for (const [id, input] of this.inputs) {
+      map.set(id, input.getValue());
     }
-
-    if (!errorElement) {
-      setFormError(formErrorId, formErrorPrefix + message);
-      continue;
-    }
-
-    if (errorElement.textContent !== "!") {
-      errorElement.textContent += `\n${message}`;
-    } else {
-      errorElement.textContent = message;
-    }
-
-    errorElement.classList.remove("hidden");
-    errorElement.ariaHidden = "false";
-
-    if (inputElement) {
-      inputElement.ariaInvalid = "true";
-    }
+    return map;
   }
 }
 
-export function setFormError(formErrorId: string, error: string) {
-  const element = document.getElementById(formErrorId);
-  const content = document.getElementById(formErrorId + ".content");
+// deno-lint-ignore no-explicit-any
+type Class<T> = new (...args: any[]) => T;
 
-  if (!element || !content) {
-    alert(error);
-    return;
+/**
+ * # Panics
+ * If element does not exist or is not an instance of the expected type.
+ */
+function getElementById<T extends HTMLElement>(id: string, expected: Class<T>): T {
+  const element = document.getElementById(id);
+  if (!element || !(element instanceof expected)) {
+    throw `element '${id}' does not exist`;
   }
-
-  element.classList.remove("collapse");
-  element.ariaHidden = "false";
-
-  if (content.textContent !== "") {
-    content.textContent += "\n";
-  }
-  content.textContent += error;
-}
-
-export function unlockForm(inputIds: string[], submitId: string) {
-  const submitElement = document.getElementById(submitId);
-  if (submitElement && submitElement instanceof HTMLButtonElement) {
-    submitElement.disabled = false;
-  }
-
-  for (const inputId of inputIds) {
-    const element = document.getElementById(inputId);
-    if (element && element instanceof HTMLInputElement) {
-      element.disabled = false;
-    }
-  }
+  return element;
 }

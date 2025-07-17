@@ -6,15 +6,17 @@ mod htmplate_element;
 pub mod htmplates;
 mod icon;
 
-use std::path::Path;
+use std::{path::Path, sync::LazyLock};
 
 use lol_html::{Settings, element, errors::RewritingError, rewrite_str};
 
 pub use htmplate_element::{Attribute, FromElementError, HtmplateElement, Location};
 pub use lol_html;
+use regex::Regex;
 
 use crate::htmplates::{
-    Alert, Footer, FormAlert, FormSubmit, FormTextInput, Icon, Metadata, Title, replacer,
+    Alert, Footer, FormAlert, FormSubmit, FormTextInput, HtmplateError, Icon, Metadata, Title,
+    replacer,
 };
 
 /// The details for an htmplate
@@ -50,6 +52,9 @@ pub fn all_htmplate_details() -> Vec<HtmplateDetails> {
     ]
 }
 
+static NEWLINE_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(\r\n|\n|\r)\s*").unwrap());
+static GAP_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r">\s<").unwrap());
+
 /// Replace the htmplates in some source HTML.
 pub fn replace_htmplates(
     html: &str,
@@ -68,6 +73,11 @@ pub fn replace_htmplates(
             if el.tag_name().starts_with("htmplate") {
                 Err(Box::new(ReplaceHtmplateError::HtmplateDoesNotExist {
                     tag: el.tag_name(),
+                    location: Location::from_byte_index(
+                        el.source_location().bytes().start,
+                        html.as_bytes(),
+                        html_path,
+                    ),
                 }))
             } else {
                 Ok(())
@@ -104,6 +114,9 @@ pub fn replace_htmplates(
         },
     )?;
 
+    let html = NEWLINE_REGEX.replace_all(&html, " ");
+    let html = GAP_REGEX.replace_all(&html, ">\n<");
+
     Ok(format!(
         "<!-- htmplate v{} -->\n{html}",
         env!("CARGO_PKG_VERSION")
@@ -119,7 +132,10 @@ pub enum ReplaceHtmplateError {
     InvalidHtmplate { source: FromElementError },
 
     #[non_exhaustive]
-    HtmplateDoesNotExist { tag: String },
+    HtmplateError { source: HtmplateError },
+
+    #[non_exhaustive]
+    HtmplateDoesNotExist { tag: String, location: Location },
 
     #[non_exhaustive]
     RewriteError { source: RewritingError },
@@ -127,9 +143,12 @@ pub enum ReplaceHtmplateError {
 impl core::fmt::Display for ReplaceHtmplateError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match &self {
-            Self::HtmplateDoesNotExist { tag, .. } => write!(f, "htmplate `{tag}` does not exist"),
+            Self::HtmplateDoesNotExist { tag, location, .. } => {
+                write!(f, "htmplate `{tag}` at `{location}` does not exist")
+            }
             Self::RewriteError { .. } => write!(f, "rewriting returned an error"),
             Self::InvalidHtmplate { .. } => write!(f, "syntax error"),
+            Self::HtmplateError { .. } => write!(f, "error while replacing an htmplate"),
         }
     }
 }
@@ -138,6 +157,7 @@ impl core::error::Error for ReplaceHtmplateError {
         match &self {
             Self::InvalidHtmplate { source, .. } => Some(source),
             Self::RewriteError { source, .. } => Some(source),
+            Self::HtmplateError { source } => Some(source),
             _ => None,
         }
     }

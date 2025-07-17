@@ -2,30 +2,25 @@
 
 use std::{fs, io, path::Path};
 
-/// The bundled and minified CSS for this version.
-pub const CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/lib.min.css"));
-/// The bundled and minified JS for this version.
-pub const JS: &str = include_str!(concat!(env!("OUT_DIR"), "/lib.js"));
-/// The declaration file for the JS.
-pub const DECLARATION: &str = include_str!(concat!(env!("OUT_DIR"), "/lib.d.ts"));
+const CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/style.min.css"));
 
-/// The favicon.
-pub const FAVICON: &[u8] = include_bytes!("assets/favicon.ico");
+const BASE64_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/base64.js"));
+const BASE64_DECLARATION: &str = include_str!(concat!(env!("OUT_DIR"), "/base64.d.ts"));
+const FETCH_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/fetch.js"));
+const FETCH_DECLARATION: &str = include_str!(concat!(env!("OUT_DIR"), "/fetch.d.ts"));
+const FORM_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/form.js"));
+const FORM_DECLARATION: &str = include_str!(concat!(env!("OUT_DIR"), "/form.d.ts"));
 
-/// Fira code font.
-pub const FIRA_CODE: &[u8] = include_bytes!("assets/styles/fonts/FiraCode.ttf");
-/// Fira code license
-pub const FIRA_CODE_LICENSE: &[u8] = include_bytes!("assets/styles/fonts/FiraCode-OFL.txt");
+const FAVICON: &[u8] = include_bytes!("assets/favicon.ico");
 
-/// Nunito font.
-pub const NUNITO: &[u8] = include_bytes!("assets/styles/fonts/Nunito.ttf");
-/// Nunito license
-pub const NUNITO_LICENSE: &[u8] = include_bytes!("assets/styles/fonts/Nunito-OFL.txt");
+const FIRA_CODE: &[u8] = include_bytes!("assets/styles/fonts/FiraCode.ttf");
+const FIRA_CODE_LICENSE: &[u8] = include_bytes!("assets/styles/fonts/FiraCode-OFL.txt");
 
-/// Quicksand font.
-pub const QUICKSAND: &[u8] = include_bytes!("assets/styles/fonts/Quicksand.ttf");
-/// Quicksand license
-pub const QUICKSAND_LICENSE: &[u8] = include_bytes!("assets/styles/fonts/Quicksand-OFL.txt");
+const NUNITO: &[u8] = include_bytes!("assets/styles/fonts/Nunito.ttf");
+const NUNITO_LICENSE: &[u8] = include_bytes!("assets/styles/fonts/Nunito-OFL.txt");
+
+const QUICKSAND: &[u8] = include_bytes!("assets/styles/fonts/Quicksand.ttf");
+const QUICKSAND_LICENSE: &[u8] = include_bytes!("assets/styles/fonts/Quicksand-OFL.txt");
 
 /// Write the assets to a given directory.
 pub fn write_assets(directory: &Path) -> io::Result<()> {
@@ -37,11 +32,15 @@ pub fn write_assets(directory: &Path) -> io::Result<()> {
     fs::create_dir_all(directory.join("fonts"))?;
 
     // Write style
-    fs::write(directory.join("lib.min.css"), CSS)?;
+    fs::write(directory.join("style.min.css"), CSS)?;
 
     // Write scripts
-    fs::write(directory.join("lib.js"), JS)?;
-    fs::write(directory.join("lib.d.ts"), DECLARATION)?;
+    fs::write(directory.join("base64.js"), BASE64_JS)?;
+    fs::write(directory.join("base64.d.ts"), BASE64_DECLARATION)?;
+    fs::write(directory.join("fetch.js"), FETCH_JS)?;
+    fs::write(directory.join("fetch.d.ts"), FETCH_DECLARATION)?;
+    fs::write(directory.join("form.js"), FORM_JS)?;
+    fs::write(directory.join("form.d.ts"), FORM_DECLARATION)?;
 
     // Write static
     fs::write(directory.join("favicon.ico"), FAVICON)?;

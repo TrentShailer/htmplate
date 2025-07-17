@@ -1,0 +1,21 @@
+<div>
+  <label id="{label_id}" for="{input_id}">
+    {required_marker}
+    <span>{label}:</span>
+  </label>
+  <input
+    id="{input_id}"
+    type="text"
+    name="{input_id}"
+    placeholder="{label}"
+    {required_attribute}
+    {extra_attributes}
+  />
+  <small
+    class="hidden"
+    role="status"
+    aria-labelledby="{label_id}"
+    aria-hidden="true"
+    id="{error_id}"
+  >!</small>
+</div>

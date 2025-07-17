@@ -3,7 +3,7 @@ use core::str::FromStr;
 use htmplate_derive::HtmplateElement;
 
 use crate::{
-    htmplates::{HtmplateError, ToHtml},
+    htmplates::{HtmplateErrorKind, ToHtml},
     icon::Icon,
 };
 
@@ -35,15 +35,17 @@ impl FromStr for AlertStyle {
 #[derive(HtmplateElement)]
 /// an admonition style alert.
 pub struct Alert {
-    /// one of [error, warning, success, info, basic]
+    /// this should be one of [error, warning, success, info, basic]
     pub status: AlertStyle,
-    /// the alert text
+    /// this should be the alert text
     pub text: Option<String>,
 }
 
 impl ToHtml for Alert {
-    fn to_html(self) -> Result<String, HtmplateError> {
-        let icon = match &self.status {
+    fn to_html(self) -> Result<String, HtmplateErrorKind> {
+        let Self { status, text } = self;
+
+        let icon = match &status {
             AlertStyle::Error => Icon::AlertCircle.svg(),
             AlertStyle::Warning => Icon::Warning.svg(),
             AlertStyle::Success => Icon::CheckmarkCircle.svg(),
@@ -51,7 +53,7 @@ impl ToHtml for Alert {
             AlertStyle::Basic => Icon::InformationCircle.svg(),
         };
 
-        let class = match &self.status {
+        let class = match &status {
             AlertStyle::Error => "error",
             AlertStyle::Warning => "warning",
             AlertStyle::Success => "success",
@@ -59,13 +61,13 @@ impl ToHtml for Alert {
             AlertStyle::Basic => "",
         };
 
-        let text = self.text.unwrap_or_default();
+        let html = format!(
+            include_str!("template.html"),
+            class = class,
+            icon = icon,
+            text = text.unwrap_or_default()
+        );
 
-        Ok(format!(
-            r#"
-            <div class="alert {class}">
-                {icon}{text}
-            </div>"#
-        ))
+        Ok(html)
     }
 }

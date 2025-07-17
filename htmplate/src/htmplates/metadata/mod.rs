@@ -15,19 +15,14 @@ impl Metadata {
     pub fn to_html(
         self,
         path_from_output_to_assets: &Path,
-    ) -> Result<String, super::HtmplateError> {
-        let icon_path = path_from_output_to_assets.join("favicon.ico");
-        let css_path = path_from_output_to_assets.join("lib.min.css");
+    ) -> Result<String, super::HtmplateErrorKind> {
+        let favicon_path = path_from_output_to_assets.join("favicon.ico");
+        let css_path = path_from_output_to_assets.join("style.min.css");
 
         Ok(format!(
-            r#"
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta name="author" content="Trent Shailer">
-            <link rel="icon" type="image/x-icon" href="{}">
-            <link rel="stylesheet" href="{}">"#,
-            icon_path.to_string_lossy().replace("\\", "/"),
-            css_path.to_string_lossy().replace("\\", "/")
+            include_str!("template.html"),
+            favicon = favicon_path.to_string_lossy().replace("\\", "/"),
+            css = css_path.to_string_lossy().replace("\\", "/")
         ))
     }
 

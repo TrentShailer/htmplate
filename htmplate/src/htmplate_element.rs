@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 /// A trait marking a struct as an htmplate.
 pub trait HtmplateElement: Sized {
@@ -34,7 +34,7 @@ pub struct Attribute {
 /// A location in a file.
 pub struct Location {
     /// The path to the file.
-    path: PathBuf,
+    path: String,
     /// The line number.
     line: usize,
     /// The column
@@ -62,7 +62,7 @@ impl Location {
         }
 
         Self {
-            path: path.to_path_buf(),
+            path: path.to_string_lossy().to_string(),
             line,
             column,
         }
@@ -70,13 +70,7 @@ impl Location {
 }
 impl core::fmt::Display for Location {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(
-            f,
-            "{}:{}:{}",
-            self.path.to_string_lossy(),
-            self.line,
-            self.column
-        )
+        write!(f, "{}:{}:{}", self.path, self.line, self.column)
     }
 }
 
@@ -84,8 +78,8 @@ impl core::fmt::Display for Location {
 #[derive(Debug)]
 #[allow(missing_docs)]
 pub struct FromElementError {
-    pub missing_attributes: Vec<Attribute>,
-    pub invalid_attributes: Vec<Attribute>,
+    pub missing_attributes: Box<[Attribute]>,
+    pub invalid_attributes: Box<[Attribute]>,
     pub element_tag: String,
     pub element_location: Location,
 }
@@ -101,7 +95,7 @@ impl core::fmt::Display for FromElementError {
         for attribute in &self.missing_attributes {
             writeln!(
                 f,
-                "  missing required attribute `{}`, this should be {}",
+                "  missing required attribute `{}`, {}",
                 attribute.name, attribute.description
             )?;
         }
@@ -109,7 +103,7 @@ impl core::fmt::Display for FromElementError {
         for attribute in &self.invalid_attributes {
             writeln!(
                 f,
-                "  invalid attribute `{}`, this should be {}",
+                "  invalid attribute `{}`, {}",
                 attribute.name, attribute.description
             )?;
         }

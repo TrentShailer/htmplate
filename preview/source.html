@@ -10,23 +10,23 @@
       <div class="column">
         <htmplate:title icon="person-add" text="Register" />
         <br />
-        <form id="register" name="register">
-          <htmplate:form-alert />
+        <form id="/register" name="register">
+          <htmplate:form-alert form="/register" />
           <htmplate:form-text-input
-            id="username"
-            required="true"
-            min-length="4"
-            max-length="64"
+            id="/username"
+            form="/register"
             label="Username"
+            required="true"
+            credential="true"
           />
           <htmplate:form-text-input
-            id="displayName"
-            required="true"
-            min-length="4"
-            max-length="64"
+            id="/displayName"
+            form="/register"
             label="Display Name"
+            required="true"
+            credential="true"
           />
-          <htmplate:form-submit />
+          <htmplate:form-submit form="/register" />
         </form>
       </div>
     </main>

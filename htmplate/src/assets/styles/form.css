@@ -4,13 +4,17 @@ form {
   gap: 0.5rem;
 }
 
-form > section {
+form > div:not(.alert) {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
 }
 
-form > section > small {
+form > div:not(.alert) > small {
+  color: var(--red);
+}
+
+form > div:not(.alert) > label strong {
   color: var(--red);
 }
 

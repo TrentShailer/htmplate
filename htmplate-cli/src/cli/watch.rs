@@ -73,14 +73,29 @@ fn report_result(
 
         Err(error) => match error {
             TemplateError::TemplateHtml { ref source } => match source {
-                ReplaceHtmplateError::InvalidHtmplate { source: error, .. } => {
+                ReplaceHtmplateError::InvalidHtmplate { source, .. } => {
                     print_fail(format_args!(
                         "Could not template `{}`",
                         source_file.to_string_lossy()
                     ));
 
-                    let report = error.to_string();
+                    let report = source.to_string();
                     print!("{report}");
+                    *y += report.lines().count() + 1
+                }
+
+                ReplaceHtmplateError::HtmplateError { source, .. } => {
+                    print_fail(format_args!(
+                        "Could not template `{}`",
+                        source_file.to_string_lossy()
+                    ));
+
+                    let report = ErrorStackStyle::Stacked { indent: 2 }
+                        .display(&source)
+                        .unwrap_or_default();
+
+                    print!("{report}");
+
                     *y += report.lines().count() + 1
                 }
 
