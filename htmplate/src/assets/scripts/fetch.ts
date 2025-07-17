@@ -13,10 +13,16 @@ type ServerResponse<T> =
 export async function fetch<T>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
-  body: any | null,
+  additionalHeaders: [string, string][] | null,
+  body: object | null,
 ): Promise<ServerResponse<T>> {
-  // TODO how to handle API key
   const headers = new Headers();
+
+  if (additionalHeaders) {
+    for (const header of additionalHeaders) {
+      headers.append(header[0], header[1]);
+    }
+  }
 
   if (body) {
     headers.append("content-type", "application/json");
@@ -48,7 +54,7 @@ export async function fetch<T>(
 
     return {
       status: "ok",
-      body: await response.json(), // TODO what about 204
+      body: await response.json(),
     };
   } else if (response.status === 401) {
     return { status: "unauthorized" };
