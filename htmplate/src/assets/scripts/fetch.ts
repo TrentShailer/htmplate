@@ -10,13 +10,59 @@ export type ServerResponse<T> =
   | { status: "unauthorized" }
   | never;
 
+export type LogoutConfig = {
+  endpoint: string;
+  redirect: string;
+};
+
+export type Header = [string, string];
+
 export const TOKEN_KEY = "token";
+
+export class FetchBuilder {
+  #method: "GET" | "POST" | "PUT" | "DELETE";
+  #url: string;
+  #additionalHeaders: Header[] | null = null;
+  #body: object | null = null;
+  #logoutConfig: LogoutConfig | null = null;
+
+  constructor(method: "GET" | "POST" | "PUT" | "DELETE", url: string) {
+    this.#method = method;
+    this.#url = url;
+  }
+
+  setBody(body: object | null): FetchBuilder {
+    this.#body = body;
+    return this;
+  }
+
+  setHeaders(headers: Header[] | null): FetchBuilder {
+    this.#additionalHeaders = headers;
+    return this;
+  }
+
+  setLogout(logoutConfig: LogoutConfig | null): FetchBuilder {
+    this.#logoutConfig = logoutConfig;
+    return this;
+  }
+
+  async fetch<T>(): Promise<ServerResponse<T>> {
+    return await fetch(
+      this.#method,
+      this.#url,
+      this.#additionalHeaders,
+      this.#body,
+      this.#logoutConfig,
+    );
+  }
+}
 
 export async function fetch<T>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
-  additionalHeaders: [string, string][] | null,
+  additionalHeaders: Header[] | null,
   body: object | null,
+  logoutConfig: LogoutConfig | null,
 ): Promise<ServerResponse<T>> {
   const headers = new Headers();
 
@@ -66,6 +112,10 @@ export async function fetch<T>(
       body,
     };
   } else if (response.status === 401) {
+    if (logoutConfig) {
+      await logout(logoutConfig.endpoint, additionalHeaders, logoutConfig.redirect);
+    }
+
     return { status: "unauthorized" };
   } else if (response.status >= 400 && response.status < 500) {
     let body = { problems: [] };
@@ -81,4 +131,18 @@ export async function fetch<T>(
   } else {
     return { status: "serverError" };
   }
+}
+
+export async function logout(
+  endpoint: string,
+  additionalHeaders: Header[] | null,
+  redirect: string,
+): Promise<never> {
+  await new FetchBuilder("DELETE", endpoint).setHeaders(additionalHeaders).fetch();
+  localStorage.removeItem(TOKEN_KEY);
+  location.href = redirect;
+
+  // Prevent further execution of JS
+  // deno-lint-ignore no-empty
+  while (true) {}
 }
