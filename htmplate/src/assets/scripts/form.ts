@@ -38,6 +38,10 @@ export class Input {
   constructor(formId: string, inputId: string) {
     this.input = getElementById<HTMLInputElement>(`${formId}${inputId}/input`, HTMLInputElement);
     this.error = getElementById<HTMLElement>(`${formId}${inputId}/error`, HTMLElement);
+
+    this.input.addEventListener("input", () => {
+      this.input.setCustomValidity("");
+    });
   }
 
   getValue(): string {

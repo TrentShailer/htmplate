@@ -6,6 +6,7 @@ register.form.addEventListener("submit", (event) => {
   event.preventDefault();
 
   register.lock();
+  register.clearErrors();
   const values = register.getValues();
 
   const username = values.get("/username") ?? "";
