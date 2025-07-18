@@ -3,7 +3,7 @@ export type Problem = {
   detail: string | null;
 };
 
-type ServerResponse<T> =
+export type ServerResponse<T> =
   | { status: "ok"; body: T }
   | { status: "clientError"; problems: Problem[] }
   | { status: "serverError" }
