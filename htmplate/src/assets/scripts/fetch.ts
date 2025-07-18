@@ -10,6 +10,8 @@ export type ServerResponse<T> =
   | { status: "unauthorized" }
   | never;
 
+export const TOKEN_KEY = "token";
+
 export async function fetch<T>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
@@ -27,8 +29,8 @@ export async function fetch<T>(
   if (body) {
     headers.append("content-type", "application/json");
   }
-  const token = localStorage.getItem("token");
 
+  const token = localStorage.getItem(TOKEN_KEY);
   if (token) {
     headers.append("Authorization", token);
   }
@@ -49,17 +51,29 @@ export async function fetch<T>(
   if (response.ok) {
     const bearer = response.headers.get("Authorization");
     if (bearer) {
-      localStorage.setItem("token", bearer);
+      localStorage.setItem(TOKEN_KEY, bearer);
     }
+
+    // deno-lint-ignore no-explicit-any
+    let body: any = {};
+    try {
+      body = await response.json();
+      // deno-lint-ignore no-empty
+    } catch {}
 
     return {
       status: "ok",
-      body: await response.json(),
+      body,
     };
   } else if (response.status === 401) {
     return { status: "unauthorized" };
   } else if (response.status >= 400 && response.status < 500) {
-    const body = await response.json();
+    let body = { problems: [] };
+    try {
+      body = await response.json();
+      // deno-lint-ignore no-empty
+    } catch {}
+
     return {
       status: "clientError",
       problems: body.problems ?? [],
