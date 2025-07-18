@@ -138,8 +138,14 @@ export async function logout(
   additionalHeaders: Header[] | null,
   redirect: string,
 ): Promise<never> {
+  const token = localStorage.getItem(TOKEN_KEY);
   await new FetchBuilder("DELETE", endpoint).setHeaders(additionalHeaders).fetch();
   localStorage.removeItem(TOKEN_KEY);
+
+  if (token) {
+    alert("Your session has expired");
+  }
+
   location.href = redirect;
 
   // Prevent further execution of JS
