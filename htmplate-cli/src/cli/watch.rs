@@ -33,10 +33,16 @@ impl Command {
             .map_err(|source| WatchError::WatchSource { source })?;
 
         let mut last_event = Instant::now();
-        for result in rx {
+        for result in &rx {
+            // Format at most once per 100 milliseconds
             if last_event.elapsed() < Duration::from_millis(100) {
                 continue;
             }
+            // Do not format if there is another event within 100 milliseconds
+            if rx.recv_timeout(Duration::from_millis(100)).is_ok() {
+                continue;
+            }
+
             result.map_err(|source| WatchError::WatchSource { source })?;
 
             let result = template_file(source, output, asset_directory);
