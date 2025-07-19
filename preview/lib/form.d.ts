@@ -6,6 +6,7 @@ export declare class FormError {
     clearError(): void;
     addError(error: string): void;
     setError(error: string): void;
+    unexpectedResponse(action: string): void;
 }
 export declare class Input {
     input: HTMLInputElement;

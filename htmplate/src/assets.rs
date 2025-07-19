@@ -10,6 +10,8 @@ const FETCH_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/fetch.js"));
 const FETCH_DECLARATION: &str = include_str!(concat!(env!("OUT_DIR"), "/fetch.d.ts"));
 const FORM_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/form.js"));
 const FORM_DECLARATION: &str = include_str!(concat!(env!("OUT_DIR"), "/form.d.ts"));
+const REDIRECT_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/redirect.js"));
+const REDIRECT_DECLARATION: &str = include_str!(concat!(env!("OUT_DIR"), "/redirect.d.ts"));
 
 const FAVICON: &[u8] = include_bytes!("assets/favicon.ico");
 
@@ -41,6 +43,8 @@ pub fn write_assets(directory: &Path) -> io::Result<()> {
     fs::write(directory.join("fetch.d.ts"), FETCH_DECLARATION)?;
     fs::write(directory.join("form.js"), FORM_JS)?;
     fs::write(directory.join("form.d.ts"), FORM_DECLARATION)?;
+    fs::write(directory.join("redirect.js"), REDIRECT_JS)?;
+    fs::write(directory.join("redirect.d.ts"), REDIRECT_DECLARATION)?;
 
     // Write static
     fs::write(directory.join("favicon.ico"), FAVICON)?;

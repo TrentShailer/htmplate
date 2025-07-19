@@ -1,3 +1,4 @@
+import { setHref } from "./lib/redirect.js";
 import { Form } from "./lib/form.js";
 
 const register = new Form("/register", ["/username", "/displayName"]);
@@ -30,3 +31,11 @@ register.form.addEventListener("submit", (event) => {
     register.unlock();
   }, 1000);
 });
+
+const redirect = document.getElementById("redirect");
+if (redirect) {
+  redirect.addEventListener("click", async () => {
+    await setHref("/source");
+    console.log("Shouldn't execute");
+  });
+}

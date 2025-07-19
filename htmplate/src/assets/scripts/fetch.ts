@@ -1,3 +1,5 @@
+import { setHref } from "./redirect.ts";
+
 export type Problem = {
   pointer: string | null;
   detail: string | null;
@@ -144,9 +146,5 @@ export async function logout(
     alert("Your session has expired");
   }
 
-  location.href = redirect;
-
-  // Prevent further execution of JS
-  // deno-lint-ignore no-empty
-  while (true) {}
+  return await setHref(redirect);
 }
