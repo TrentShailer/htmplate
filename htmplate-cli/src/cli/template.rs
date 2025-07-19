@@ -13,6 +13,7 @@ pub fn template_file(
     output: &Path,
     asset_directory: Option<&Path>,
 ) -> Result<(), TemplateError> {
+    log::debug!("templating {source:?} into {output:?}");
     let source_file = File::Source(source.to_path_buf());
     let output_file = File::Output(output.to_path_buf());
 
@@ -51,9 +52,13 @@ pub fn template_file(
     let output_directory = output.parent().unwrap();
     let asset_directory = asset_directory
         .map(Path::to_path_buf)
-        .unwrap_or_else(|| output_directory.join("lib"));
+        .unwrap_or_else(|| output_directory.join("lib"))
+        .canonicalize()
+        .unwrap_or_else(|_| output_directory.join("lib"));
+    log::debug!("asset directory is {asset_directory:?}");
     let asset_file = File::Assets(asset_directory.clone());
     let path_from_output_to_assets = diff_paths(&asset_directory, output_directory).unwrap();
+    log::debug!("asset directory relative to output is {path_from_output_to_assets:?}");
 
     // Get source contents
     let html = fs::read_to_string(source)
