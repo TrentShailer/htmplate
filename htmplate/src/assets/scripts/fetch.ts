@@ -90,7 +90,8 @@ export async function fetch<T>(
     method,
     body: bodyContent,
     headers,
-  }).catch(() => {
+  }).catch((ex) => {
+    console.warn(ex);
     return new Response(null, { status: 500 });
   });
 
@@ -100,12 +101,10 @@ export async function fetch<T>(
       localStorage.setItem(TOKEN_KEY, bearer);
     }
 
-    // deno-lint-ignore no-explicit-any
-    let body: any = {};
-    try {
-      body = await response.json();
-      // deno-lint-ignore no-empty
-    } catch {}
+    const body = await response.json().catch((ex) => {
+      console.warn(ex);
+      return {};
+    });
 
     return {
       status: "ok",
@@ -118,11 +117,10 @@ export async function fetch<T>(
 
     return { status: "unauthorized" };
   } else if (response.status >= 400 && response.status < 500) {
-    let body = { problems: [] };
-    try {
-      body = await response.json();
-      // deno-lint-ignore no-empty
-    } catch {}
+    const body = await response.json().catch((ex) => {
+      console.warn(ex);
+      return { problems: [] };
+    });
 
     return {
       status: "clientError",

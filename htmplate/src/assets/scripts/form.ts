@@ -29,6 +29,10 @@ export class FormError {
     this.element.ariaHidden = "false";
     this.contents.textContent = error;
   }
+
+  unexpectedResponse(action: string) {
+    this.setError(`Could not ${action} because the server sent an unexpected response.`);
+  }
 }
 
 export class Input {
