@@ -26,11 +26,8 @@ pub struct Cli {
 pub enum Command {
     /// Watch a file and template it whenever it is modified.
     Watch {
-        /// The path to the HTML file containing htmplates.
+        /// The path to watch for changes to `.template.html` file changes.
         source: PathBuf,
-
-        /// The file to output the templated HTML to.
-        output: PathBuf,
 
         /// The path to the asset directory, default is next to the output.
         #[clap(long)]
@@ -76,7 +73,6 @@ impl Command {
         match self {
             Self::Watch {
                 source,
-                output,
                 asset_directory,
                 verbose,
             } => {
@@ -84,7 +80,7 @@ impl Command {
                     simple_logger::init_with_level(Level::Debug)
                         .map_err(|source| CommandError::SetupLogger { source })?;
                 }
-                Self::watch(&source, &output, asset_directory.as_deref())
+                Self::watch(&source, asset_directory.as_deref())
                     .map_err(|source| CommandError::Watch { source })?
             }
 
