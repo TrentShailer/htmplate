@@ -4,6 +4,7 @@
 mod alert;
 mod footer;
 mod form;
+mod hr;
 mod icon;
 mod metadata;
 mod title;
@@ -15,6 +16,7 @@ use lol_html::html_content::ContentType;
 pub use alert::Alert;
 pub use footer::Footer;
 pub use form::{FormAlert, FormSubmit, FormTextInput};
+pub use hr::Hr;
 pub use icon::Icon;
 pub use metadata::Metadata;
 pub use title::Title;

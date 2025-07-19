@@ -15,7 +15,7 @@ pub use lol_html;
 use regex::Regex;
 
 use crate::htmplates::{
-    Alert, Footer, FormAlert, FormSubmit, FormTextInput, HtmplateError, Icon, Metadata, Title,
+    Alert, Footer, FormAlert, FormSubmit, FormTextInput, Hr, HtmplateError, Icon, Metadata, Title,
     replacer,
 };
 
@@ -49,6 +49,7 @@ pub fn all_htmplate_details() -> Vec<HtmplateDetails> {
         HtmplateDetails::new::<FormTextInput>(),
         HtmplateDetails::new::<FormSubmit>(),
         HtmplateDetails::new::<Icon>(),
+        HtmplateDetails::new::<Hr>(),
     ]
 }
 
@@ -99,6 +100,7 @@ pub fn replace_htmplates(
                 element!(Icon::tag(), |el| replacer::<Icon>(el, html, html_path)),
                 element!(Footer::tag(), |el| replacer::<Footer>(el, html, html_path)),
                 element!(Alert::tag(), |el| replacer::<Alert>(el, html, html_path)),
+                element!(Hr::tag(), |el| replacer::<Hr>(el, html, html_path)),
                 element!(FormAlert::tag(), |el| replacer::<FormAlert>(
                     el, html, html_path
                 )),

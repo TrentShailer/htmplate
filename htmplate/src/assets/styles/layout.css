@@ -40,3 +40,28 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
 }
+
+hr {
+  color: var(--subtext0);
+}
+
+.hr {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  height: 4rem;
+}
+.hr > div.hr-line {
+  height: 0.1rem;
+  flex-grow: 1;
+  background-color: var(--subtext0);
+}
+.hr > div.hr-text {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  color: var(--subtext0);
+  fill: var(--subtext0);
+  outline: var(--subtext0);
+  text-align: center;
+}
