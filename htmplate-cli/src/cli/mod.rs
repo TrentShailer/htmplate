@@ -1,6 +1,7 @@
 use std::{io, path::PathBuf};
 
 use clap::{Parser, Subcommand};
+use log::Level;
 
 use crate::cli::{
     template::{TemplateError, template_file},
@@ -34,6 +35,10 @@ pub enum Command {
         /// The path to the asset directory, default is next to the output.
         #[clap(long)]
         asset_directory: Option<PathBuf>,
+
+        /// Enable verbose debug output
+        #[arg(long)]
+        verbose: bool,
     },
 
     /// Template a file
@@ -47,6 +52,10 @@ pub enum Command {
         /// The path to the asset directory, default is next to the output.
         #[clap(long)]
         asset_directory: Option<PathBuf>,
+
+        /// Enable verbose debug output
+        #[arg(long)]
+        verbose: bool,
     },
 
     /// Write the assets out
@@ -69,15 +78,29 @@ impl Command {
                 source,
                 output,
                 asset_directory,
-            } => Self::watch(&source, &output, asset_directory.as_deref())
-                .map_err(|source| CommandError::Watch { source })?,
+                verbose,
+            } => {
+                if verbose {
+                    simple_logger::init_with_level(Level::Debug)
+                        .map_err(|source| CommandError::SetupLogger { source })?;
+                }
+                Self::watch(&source, &output, asset_directory.as_deref())
+                    .map_err(|source| CommandError::Watch { source })?
+            }
 
             Self::Template {
                 source,
                 output,
                 asset_directory,
-            } => template_file(&source, &output, asset_directory.as_deref())
-                .map_err(|source| CommandError::Template { source })?,
+                verbose,
+            } => {
+                if verbose {
+                    simple_logger::init_with_level(Level::Debug)
+                        .map_err(|source| CommandError::SetupLogger { source })?;
+                }
+                template_file(&source, &output, asset_directory.as_deref())
+                    .map_err(|source| CommandError::Template { source })?
+            }
 
             Self::Assets { asset_directory } => Self::write_assets(&asset_directory)
                 .map_err(|source| CommandError::Assets { source })?,
@@ -106,6 +129,9 @@ pub enum CommandError {
 
     #[non_exhaustive]
     Watch { source: WatchError },
+
+    #[non_exhaustive]
+    SetupLogger { source: log::SetLoggerError },
 }
 impl core::fmt::Display for CommandError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -114,6 +140,7 @@ impl core::fmt::Display for CommandError {
             Self::Assets { .. } => write!(f, "writing assets failed"),
             Self::Template { .. } => write!(f, "templating HTML failed"),
             Self::Watch { .. } => write!(f, "failed while watching"),
+            Self::SetupLogger { .. } => write!(f, "failed to create logger"),
         }
     }
 }
@@ -124,6 +151,7 @@ impl core::error::Error for CommandError {
             Self::Assets { source, .. } => Some(source),
             Self::Template { source, .. } => Some(source),
             Self::Watch { source, .. } => Some(source),
+            Self::SetupLogger { source, .. } => Some(source),
         }
     }
 }

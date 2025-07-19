@@ -58,23 +58,29 @@ pub fn template_file(
     // Get source contents
     let html = fs::read_to_string(source)
         .map_err(|source| TemplateError::read_file(source, &source_file))?;
+    log::debug!("source size: {} bytes", html.len());
 
     // Template the HTML
     let templated = replace_htmplates(&html, source, &path_from_output_to_assets)
         .map_err(|source| TemplateError::TemplateHtml { source })?;
+    log::debug!("templated HTML");
 
     // Write the templated HTML to file
     write_html(&templated, output)
         .map_err(|source| TemplateError::write_file(source, &output_file))?;
+    log::debug!("wrote HTML");
 
     // Write the assets out
     assets::write_assets(&asset_directory)
         .map_err(|source| TemplateError::write_file(source, &asset_file))?;
+    log::debug!("wrote assets");
 
     Ok(())
 }
 
 fn write_html(html: &str, output: &Path) -> io::Result<()> {
+    log::debug!("unformatted output size: {} bytes", html.len());
+
     // Ensure deno exists.
     if std::process::Command::new("deno")
         .arg("--version")
@@ -83,6 +89,7 @@ fn write_html(html: &str, output: &Path) -> io::Result<()> {
         .spawn()
         .is_err()
     {
+        log::debug!("deno does not exit");
         fs::write(output, html)?;
         return Ok(());
     }
@@ -119,6 +126,7 @@ fn write_html(html: &str, output: &Path) -> io::Result<()> {
             .expect("Failed to take stderr on the printer process");
         let mut stderr_buffer = String::new();
         stderr.read_to_string(&mut stderr_buffer)?;
+        log::debug!("deno fmt failed: {stderr_buffer}");
 
         fs::write(output, html)?;
         return Ok(());
