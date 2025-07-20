@@ -35,7 +35,7 @@ function compile_typescript(source_path: string, output_directory: string) {
   const stem = path.basename(source_path, ".ts");
 
   const jsHeader = [...denoComments, `// @ts-self-types="./${stem}.d.ts"`].join("\n");
-  const jsBody = js.outputText;
+  const jsBody = js.outputText.replaceAll('.ts"', '.js"');
   const outputJs = UglifyJs.minify(`${jsHeader}\n${jsBody}`, {
     output: { comments: "all" },
     mangle: { keep_fargs: true },
