@@ -65,8 +65,8 @@ input[type="text"] {
 }
 
 input[type="checkbox"] {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.1rem;
+  height: 1.1rem;
   margin: 0;
   cursor: pointer;
 }
@@ -74,10 +74,13 @@ input[type="checkbox"]:checked:not(:disabled) {
   background-color: var(--mauve);
   outline: none;
 }
+input[type="checkbox"] ~ label {
+  line-height: 1.1rem;
+}
 input[type="checkbox"] ~ svg {
   position: absolute;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.1rem;
+  height: 1.1rem;
   pointer-events: none;
   color: var(--base);
   opacity: 0;
