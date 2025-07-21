@@ -6,12 +6,10 @@
 
   padding: 0.5rem;
   border-radius: var(--radius);
-  display: flex;
-  gap: 0.5rem;
-}
 
-.alert > div {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.5rem 1fr;
+  gap: 0.5rem;
 }
 
 .alert.error {
@@ -37,6 +35,6 @@
 
 .alert svg {
   height: 1.5rem;
-  padding-left: 0.1rem;
-  padding-top: 0.1rem;
+  /* padding-left: 0.1rem;
+  padding-top: 0.1rem; */
 }
