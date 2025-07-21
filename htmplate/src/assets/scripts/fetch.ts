@@ -16,7 +16,7 @@ export type ServerResponse<T> =
 export type LogoutConfig = {
   deleteTokenEndpoint: string;
   loginHref: string;
-  shouldReturn: boolean;
+  additionalHeaders: Header[];
 };
 
 export type Header = [string, string];
@@ -29,6 +29,7 @@ export class FetchBuilder {
   #additionalHeaders: Header[] | null = null;
   #body: object | null = null;
   #logoutConfig: LogoutConfig | null = null;
+  #logoutShouldReturn: boolean = false;
 
   constructor(method: "GET" | "POST" | "PUT" | "DELETE", url: string) {
     this.#method = method;
@@ -45,8 +46,9 @@ export class FetchBuilder {
     return this;
   }
 
-  setLogout(logoutConfig: LogoutConfig | null): FetchBuilder {
+  setLogout(logoutConfig: LogoutConfig | null, shouldReturn: boolean): FetchBuilder {
     this.#logoutConfig = logoutConfig;
+    this.#logoutShouldReturn = shouldReturn;
     return this;
   }
 
@@ -57,6 +59,7 @@ export class FetchBuilder {
       this.#additionalHeaders,
       this.#body,
       this.#logoutConfig,
+      this.#logoutShouldReturn,
     );
   }
 }
@@ -67,6 +70,7 @@ export async function fetch<T>(
   additionalHeaders: Header[] | null,
   body: object | null,
   logoutConfig: LogoutConfig | null,
+  logoutShouldReturn: boolean,
 ): Promise<ServerResponse<T>> {
   const headers = new Headers();
 
@@ -117,10 +121,8 @@ export async function fetch<T>(
   } else if (response.status === 401) {
     if (logoutConfig) {
       await logout(
-        logoutConfig.deleteTokenEndpoint,
-        additionalHeaders,
-        logoutConfig.loginHref,
-        logoutConfig.shouldReturn,
+        logoutConfig,
+        logoutShouldReturn,
       );
     }
 
@@ -143,20 +145,21 @@ export async function fetch<T>(
 }
 
 export async function logout(
-  deleteTokenEndpoint: string,
-  additionalHeaders: Header[] | null,
-  loginHref: string,
+  config: LogoutConfig,
   shouldReturn: boolean,
 ): Promise<never> {
   const token = localStorage.getItem(TOKEN_KEY);
-  await new FetchBuilder("DELETE", deleteTokenEndpoint).setHeaders(additionalHeaders).fetch();
+  await new FetchBuilder("DELETE", config.deleteTokenEndpoint).setHeaders(config.additionalHeaders)
+    .fetch();
   localStorage.removeItem(TOKEN_KEY);
 
   if (token) {
     alert("Your session has expired");
   }
 
-  const href = shouldReturn ? `${loginHref}?redirect=${encodeURI(location.href)}` : loginHref;
+  const href = shouldReturn
+    ? `${config.loginHref}?redirect=${encodeURI(location.href)}`
+    : config.loginHref;
 
   return await setHref(href);
 }
