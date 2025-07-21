@@ -1,5 +1,6 @@
 :root {
   font-size: 18px;
+  caret-color: var(--rosewater);
 }
 
 @font-face {
@@ -105,4 +106,12 @@ aside {
 
 .title > svg {
   height: 2.5rem;
+}
+
+a {
+  border-radius: var(--radius);
+  color: var(--blue);
+}
+a:visited {
+  color: var(--mauve);
 }
