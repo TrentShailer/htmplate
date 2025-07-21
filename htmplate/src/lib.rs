@@ -58,11 +58,7 @@ static NEWLINE_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(\r\n|\n|\
 static GAP_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r">\s<").unwrap());
 
 /// Replace the htmplates in some source HTML.
-pub fn replace_htmplates(
-    html: &str,
-    html_path: &Path,
-    path_from_output_to_assets: &Path,
-) -> Result<String, ReplaceHtmplateError> {
+pub fn replace_htmplates(html: &str, html_path: &Path) -> Result<String, ReplaceHtmplateError> {
     let tags: Vec<_> = all_htmplate_details()
         .into_iter()
         .map(|detail| detail.tag)
@@ -92,7 +88,7 @@ pub fn replace_htmplates(
         Settings {
             #[rustfmt::skip]
             element_content_handlers: vec![
-                element!(Metadata::tag(), |el| Metadata::replacer( el, html, html_path, path_from_output_to_assets)),
+                element!(Metadata::tag(), |el| replacer::<Metadata>(el, html, html_path)),
                 element!(Title::tag(), |el| replacer::<Title>(el, html, html_path)),
                 element!(Icon::tag(), |el| replacer::<Icon>(el, html, html_path)),
                 element!(Footer::tag(), |el| replacer::<Footer>(el, html, html_path)),

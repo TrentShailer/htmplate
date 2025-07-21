@@ -1,12 +1,16 @@
 //! Build script for the library
 
-use std::{path::Path, process::Command};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 fn main() {
     println!("cargo::rerun-if-changed=assets/styles/");
     println!("cargo::rerun-if-changed=assets/scripts/");
 
-    let out_dir = std::env::var("OUT_DIR").unwrap();
+    let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
     let assets_root = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("src")
         .join("assets");
@@ -17,7 +21,7 @@ fn main() {
             .arg("--bundle")
             .arg("--minify")
             .arg("--output-file")
-            .arg(Path::new(&out_dir).join("style.min.css"))
+            .arg(out_dir.join("style.min.css"))
             .arg(assets_root.join("styles").join("lib.css"))
             .spawn()
             .unwrap();
@@ -26,20 +30,22 @@ fn main() {
         assert!(status.success());
     }
 
-    // Bundle JS
+    // Bundle TS
     {
-        let mut child = Command::new("deno")
-            .arg("run")
-            .arg("-A")
-            .arg(assets_root.join("build-scripts.ts"))
-            .arg("--outdir")
-            .arg(Path::new(&out_dir))
-            .arg("--indir")
-            .arg(assets_root.join("scripts"))
-            .spawn()
-            .unwrap();
+        let scripts_dir = assets_root.join("scripts");
+        for entry in fs::read_dir(scripts_dir).unwrap() {
+            let Ok(metadata) = entry else {
+                continue;
+            };
+            if metadata
+                .path()
+                .extension()
+                .is_none_or(|extension| extension != "ts")
+            {
+                continue;
+            }
 
-        let status = child.wait().unwrap();
-        assert!(status.success());
+            fs::copy(metadata.path(), out_dir.join(metadata.file_name())).unwrap();
+        }
     }
 }

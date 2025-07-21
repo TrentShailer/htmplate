@@ -4,14 +4,10 @@ use std::{fs, io, path::Path};
 
 const CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/style.min.css"));
 
-const BASE64_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/base64.js"));
-const BASE64_DECLARATION: &str = include_str!(concat!(env!("OUT_DIR"), "/base64.d.ts"));
-const FETCH_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/fetch.js"));
-const FETCH_DECLARATION: &str = include_str!(concat!(env!("OUT_DIR"), "/fetch.d.ts"));
-const FORM_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/form.js"));
-const FORM_DECLARATION: &str = include_str!(concat!(env!("OUT_DIR"), "/form.d.ts"));
-const REDIRECT_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/redirect.js"));
-const REDIRECT_DECLARATION: &str = include_str!(concat!(env!("OUT_DIR"), "/redirect.d.ts"));
+const BASE64_TS: &str = include_str!(concat!(env!("OUT_DIR"), "/base64.ts"));
+const FETCH_TS: &str = include_str!(concat!(env!("OUT_DIR"), "/fetch.ts"));
+const FORM_TS: &str = include_str!(concat!(env!("OUT_DIR"), "/form.ts"));
+const REDIRECT_TS: &str = include_str!(concat!(env!("OUT_DIR"), "/redirect.ts"));
 
 const FAVICON: &[u8] = include_bytes!("assets/favicon.ico");
 
@@ -37,14 +33,10 @@ pub fn write_assets(directory: &Path) -> io::Result<()> {
     fs::write(directory.join("style.min.css"), CSS)?;
 
     // Write scripts
-    fs::write(directory.join("base64.js"), BASE64_JS)?;
-    fs::write(directory.join("base64.d.ts"), BASE64_DECLARATION)?;
-    fs::write(directory.join("fetch.js"), FETCH_JS)?;
-    fs::write(directory.join("fetch.d.ts"), FETCH_DECLARATION)?;
-    fs::write(directory.join("form.js"), FORM_JS)?;
-    fs::write(directory.join("form.d.ts"), FORM_DECLARATION)?;
-    fs::write(directory.join("redirect.js"), REDIRECT_JS)?;
-    fs::write(directory.join("redirect.d.ts"), REDIRECT_DECLARATION)?;
+    fs::write(directory.join("base64.ts"), BASE64_TS)?;
+    fs::write(directory.join("fetch.ts"), FETCH_TS)?;
+    fs::write(directory.join("form.ts"), FORM_TS)?;
+    fs::write(directory.join("redirect.ts"), REDIRECT_TS)?;
 
     // Write static
     fs::write(directory.join("favicon.ico"), FAVICON)?;
