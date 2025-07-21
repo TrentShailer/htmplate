@@ -15,8 +15,8 @@ pub use lol_html;
 use regex::Regex;
 
 use crate::htmplates::{
-    Alert, Footer, FormAlert, FormSubmit, FormTextInput, Hr, HtmplateError, Icon, Metadata, Title,
-    replacer,
+    Alert, Footer, FormAlert, FormCheckInput, FormSubmit, FormTextInput, Hr, HtmplateError, Icon,
+    Metadata, Title, replacer,
 };
 
 /// The details for an htmplate
@@ -47,6 +47,7 @@ pub fn all_htmplate_details() -> Vec<HtmplateDetails> {
         HtmplateDetails::new::<Alert>(),
         HtmplateDetails::new::<FormAlert>(),
         HtmplateDetails::new::<FormTextInput>(),
+        HtmplateDetails::new::<FormCheckInput>(),
         HtmplateDetails::new::<FormSubmit>(),
         HtmplateDetails::new::<Icon>(),
         HtmplateDetails::new::<Hr>(),
@@ -89,27 +90,18 @@ pub fn replace_htmplates(
     let html = rewrite_str(
         html,
         Settings {
+            #[rustfmt::skip]
             element_content_handlers: vec![
-                element!(Metadata::tag(), |el| Metadata::replacer(
-                    el,
-                    html,
-                    html_path,
-                    path_from_output_to_assets
-                )),
+                element!(Metadata::tag(), |el| Metadata::replacer( el, html, html_path, path_from_output_to_assets)),
                 element!(Title::tag(), |el| replacer::<Title>(el, html, html_path)),
                 element!(Icon::tag(), |el| replacer::<Icon>(el, html, html_path)),
                 element!(Footer::tag(), |el| replacer::<Footer>(el, html, html_path)),
                 element!(Alert::tag(), |el| replacer::<Alert>(el, html, html_path)),
                 element!(Hr::tag(), |el| replacer::<Hr>(el, html, html_path)),
-                element!(FormAlert::tag(), |el| replacer::<FormAlert>(
-                    el, html, html_path
-                )),
-                element!(FormTextInput::tag(), |el| replacer::<FormTextInput>(
-                    el, html, html_path
-                )),
-                element!(FormSubmit::tag(), |el| replacer::<FormSubmit>(
-                    el, html, html_path
-                )),
+                element!(FormAlert::tag(), |el| replacer::<FormAlert>(el, html, html_path)),
+                element!(FormTextInput::tag(), |el| replacer::<FormTextInput>(el, html, html_path)),
+                element!(FormCheckInput::tag(), |el| replacer::<FormCheckInput>(el, html, html_path)),
+                element!(FormSubmit::tag(), |el| replacer::<FormSubmit>(el, html, html_path)),
                 not_found_handler,
             ],
             ..Settings::new()

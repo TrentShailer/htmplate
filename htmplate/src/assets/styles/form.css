@@ -4,99 +4,117 @@ form {
   gap: 0.5rem;
 }
 
+/* input containers */
 form > div:not(.alert) {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
 }
 
-form > div:not(.alert) > small {
+/* invalid field text */
+form small {
   color: var(--red);
 }
 
-form > div:not(.alert) > label strong {
+form label {
+  color: var(--subtext1);
+  line-height: 1.25rem;
+}
+
+/* required asterisk */
+form label strong {
   color: var(--red);
 }
 
 input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
   font-size: 1rem;
-  padding: 0.25rem 0.5rem;
-
-  outline: none;
-  border: 1px solid;
-  border-color: var(--overlay1);
-  border-radius: 0.25rem;
-
   color: var(--text);
   font-weight: 400;
+
   background-color: var(--base);
+
+  border-radius: var(--radius);
+  border: none;
+  outline: 1px solid var(--overlay1);
 }
 
-input:invalid {
-  border: 2px solid;
-  border-color: var(--red);
-  margin: -1px -1px;
+/* Show invalid outline if invalid and not focused and not placeholder (empty text) */
+input:invalid:not(:focus):not(:placeholder-shown) {
+  outline: 2px solid var(--red);
 }
 
-input:placeholder-shown {
-  border: 1px solid;
-  border-color: var(--overlay1);
-  margin: 0px 0px;
+:focus {
+  outline: 2px solid var(--mauve);
 }
 
-input:focus {
-  border: 2px solid;
-  border-color: var(--mauve);
-  margin: -1px -1px;
-}
-
-input:disabled {
+:disabled {
   background-color: var(--mantle);
-  border-color: var(--surface0);
+  outline: 1px solid var(--surface0);
   color: var(--overlay1);
   fill: var(--overlay1);
   stroke: var(--overlay1);
+  cursor: default !important;
 }
 
-label {
-  color: var(--subtext1);
+input[type="text"] {
+  padding: 0.25rem 0.5rem;
 }
 
-form span#required {
-  color: var(--red);
+input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  cursor: pointer;
+}
+input[type="checkbox"]:checked:not(:disabled) {
+  background-color: var(--mauve);
+  outline: none;
+}
+input[type="checkbox"] ~ svg {
+  position: absolute;
+  width: 1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
+  color: var(--base);
+  opacity: 0;
+}
+input[type="checkbox"]:checked ~ svg {
+  opacity: 1;
+}
+input[type="checkbox"]:checked:disabled ~ svg {
+  color: var(--surface1);
 }
 
 button {
   height: 2rem;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
-  font-size: 1rem;
-  background-color: var(--base);
-  border: 1px solid;
-  border-color: var(--overlay1);
-  border-radius: 0.25rem;
-  cursor: pointer;
-  color: var(--text);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text);
+  cursor: pointer;
+
+  background-color: var(--base);
+  outline: 1px solid var(--overlay1);
+  border: none;
+  border-radius: var(--radius);
 }
 
 button:hover {
-  background: var(--surface1);
+  background-color: var(--surface1);
 }
 
 button:active {
-  background: var(--surface0);
-}
-
-button:disabled {
-  background-color: var(--mantle);
-  border-color: var(--surface0);
-  color: var(--overlay1);
-  fill: var(--overlay1);
-  stroke: var(--overlay1);
-  cursor: default;
+  background-color: var(--surface0);
 }
 
 button > svg {

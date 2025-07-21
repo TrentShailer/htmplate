@@ -1,10 +1,12 @@
 mod alert;
+mod check_input;
 mod submit;
 mod text_input;
 
 use core::str::FromStr;
 
 pub use alert::FormAlert;
+pub use check_input::FormCheckInput;
 pub use submit::FormSubmit;
 pub use text_input::FormTextInput;
 

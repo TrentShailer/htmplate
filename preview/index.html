@@ -5,15 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Trent Shailer">
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="//?/C:/Users/trent/Files/Projects/htmplate/preview/lib/favicon.ico"
-    >
-    <link
-      rel="stylesheet"
-      href="//?/C:/Users/trent/Files/Projects/htmplate/preview/lib/style.min.css"
-    >
+    <link rel="icon" type="image/x-icon" href="lib/favicon.ico">
+    <link rel="stylesheet" href="lib/style.min.css">
     <title>Register — Trent Shailer</title>
   </head>
   <body>
@@ -95,6 +88,34 @@
               aria-hidden="true"
               id="/register/displayName/error"
             >!</small>
+          </div>
+          <div>
+            <div style="display: flex">
+              <input
+                type="checkbox"
+                id="/register/residentKey/input"
+                name="/register/residentKey/input"
+                required
+              />
+              <label
+                style="margin-left: 0.5rem"
+                id="/register/residentKey/label"
+                for="/register/residentKey/input"
+              >
+                <span aria-hidden="true"><strong>*</strong></span>
+                <span>Require resident key:</span>
+              </label>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="75"
+                  d="M416 128L192 384l-96-96"
+                />
+              </svg>
+            </div>
           </div>
           <button id="/register/submit" type="submit">Submit</button>
         </form>

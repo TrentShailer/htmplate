@@ -1,3 +1,7 @@
+:root {
+  --radius: 0.25rem;
+}
+
 .column {
   width: min(38rem, 100%);
 }

@@ -15,7 +15,7 @@ use lol_html::html_content::ContentType;
 
 pub use alert::Alert;
 pub use footer::Footer;
-pub use form::{FormAlert, FormSubmit, FormTextInput};
+pub use form::{FormAlert, FormCheckInput, FormSubmit, FormTextInput};
 pub use hr::Hr;
 pub use icon::Icon;
 pub use metadata::Metadata;

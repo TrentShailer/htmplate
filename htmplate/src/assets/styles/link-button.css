@@ -9,6 +9,7 @@ a.button {
   border-radius: 0.25rem;
   color: var(--text);
   user-select: none;
+  -webkit-user-select: none;
 }
 
 a.button:hover {

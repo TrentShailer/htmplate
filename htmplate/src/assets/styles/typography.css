@@ -81,7 +81,7 @@ pre, code {
   font-variant-ligatures: common-ligatures discretionary-ligatures contextual;
   font-size: 0.9rem;
   background-color: var(--mantle);
-  border-radius: 0.25rem;
+  border-radius: var(--radius);
 }
 
 pre {
@@ -89,6 +89,11 @@ pre {
   width: calc(100% - 2rem);
   padding: 1rem;
   overflow-x: auto;
+}
+
+aside {
+  color: var(--subtext0);
+  font-size: 0.9rem;
 }
 
 .title {

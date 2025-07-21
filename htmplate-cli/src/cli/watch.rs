@@ -1,6 +1,7 @@
 use std::{
-    collections::HashMap,
+    collections::{HashMap, VecDeque},
     ffi::OsStr,
+    fs,
     io::{self, Write, stdout},
     path::{Path, PathBuf},
     sync::mpsc::channel,
@@ -20,14 +21,37 @@ use crate::cli::{
 
 impl Command {
     pub fn watch(watch_target: &Path, asset_directory: Option<&Path>) -> Result<(), WatchError> {
+        let mut status_map: HashMap<PathBuf, FileStatus> = HashMap::new();
+
+        // First template all files on start
+        let mut file_queue = VecDeque::new();
+        file_queue.push_back(watch_target.to_path_buf());
+        while let Some(path) = file_queue.pop_front() {
+            let Ok(metadata) = fs::metadata(&path) else {
+                continue;
+            };
+            if metadata.is_dir() {
+                let Ok(dir) = fs::read_dir(&path) else {
+                    continue;
+                };
+                for entry in dir {
+                    let Ok(entry) = entry else {
+                        continue;
+                    };
+
+                    file_queue.push_back(entry.path());
+                }
+            } else if metadata.is_file() {
+                template_if_htmplate_html(&path, asset_directory, &mut status_map);
+            }
+        }
+
         let (tx, rx) = channel();
         let mut watcher =
             recommended_watcher(tx).map_err(|source| WatchError::WatchSource { source })?;
         watcher
             .watch(watch_target, RecursiveMode::Recursive)
             .map_err(|source| WatchError::WatchSource { source })?;
-
-        let mut status_map: HashMap<PathBuf, FileStatus> = HashMap::new();
 
         for result in &rx {
             let event = result.map_err(|source| WatchError::WatchSource { source })?;
@@ -50,46 +74,54 @@ impl Command {
             }
 
             for path in event.paths {
-                let Ok(path) = path.canonicalize() else {
-                    continue;
-                };
-
-                let source_name = path
-                    .file_name()
-                    .unwrap_or_else(|| OsStr::new(""))
-                    .to_string_lossy();
-
-                if !source_name.ends_with(".template.html") {
-                    continue;
-                }
-
-                let output_name = source_name.replace(".template.html", ".html");
-                let output = path.with_file_name(output_name);
-
-                let result = template_file(&path, &output, asset_directory);
-
-                if let Some(status) = status_map.get_mut(&path) {
-                    status.event_count += 1;
-                    status.last_event = Instant::now();
-                    status.last_status = result;
-                } else {
-                    status_map.insert(
-                        path,
-                        FileStatus {
-                            event_count: 1,
-                            last_event: Instant::now(),
-                            last_status: result,
-                        },
-                    );
-                }
-
-                if let Err(e) = display_tracked_files(&status_map) {
-                    eprintln!("could not display: {e}");
-                }
+                template_if_htmplate_html(&path, asset_directory, &mut status_map);
             }
         }
 
         Ok(())
+    }
+}
+
+fn template_if_htmplate_html(
+    path: &Path,
+    asset_directory: Option<&Path>,
+    status_map: &mut HashMap<PathBuf, FileStatus>,
+) {
+    let Ok(path) = path.canonicalize() else {
+        return;
+    };
+
+    let source_name = path
+        .file_name()
+        .unwrap_or_else(|| OsStr::new(""))
+        .to_string_lossy();
+
+    if !source_name.ends_with(".template.html") {
+        return;
+    }
+
+    let output_name = source_name.replace(".template.html", ".html");
+    let output = path.with_file_name(output_name);
+
+    let result = template_file(&path, &output, asset_directory);
+
+    if let Some(status) = status_map.get_mut(&path) {
+        status.event_count += 1;
+        status.last_event = Instant::now();
+        status.last_status = result;
+    } else {
+        status_map.insert(
+            path,
+            FileStatus {
+                event_count: 1,
+                last_event: Instant::now(),
+                last_status: result,
+            },
+        );
+    }
+
+    if let Err(e) = display_tracked_files(status_map) {
+        eprintln!("could not display: {e}");
     }
 }
 
