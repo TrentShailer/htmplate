@@ -13,8 +13,9 @@ export type ServerResponse<T> =
   | never;
 
 export type LogoutConfig = {
-  endpoint: string;
-  redirect: string;
+  deleteTokenEndpoint: string;
+  loginHref: string;
+  shouldReturn: boolean;
 };
 
 export type Header = [string, string];
@@ -114,7 +115,12 @@ export async function fetch<T>(
     };
   } else if (response.status === 401) {
     if (logoutConfig) {
-      await logout(logoutConfig.endpoint, additionalHeaders, logoutConfig.redirect);
+      await logout(
+        logoutConfig.deleteTokenEndpoint,
+        additionalHeaders,
+        logoutConfig.loginHref,
+        logoutConfig.shouldReturn,
+      );
     }
 
     return { status: "unauthorized" };
@@ -134,17 +140,20 @@ export async function fetch<T>(
 }
 
 export async function logout(
-  endpoint: string,
+  deleteTokenEndpoint: string,
   additionalHeaders: Header[] | null,
-  redirect: string,
+  loginHref: string,
+  shouldReturn: boolean,
 ): Promise<never> {
   const token = localStorage.getItem(TOKEN_KEY);
-  await new FetchBuilder("DELETE", endpoint).setHeaders(additionalHeaders).fetch();
+  await new FetchBuilder("DELETE", deleteTokenEndpoint).setHeaders(additionalHeaders).fetch();
   localStorage.removeItem(TOKEN_KEY);
 
   if (token) {
     alert("Your session has expired");
   }
 
-  return await setHref(redirect);
+  const href = shouldReturn ? `${loginHref}?redirect=${encodeURI(location.href)}` : loginHref;
+
+  return await setHref(href);
 }
