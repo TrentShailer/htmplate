@@ -10,6 +10,7 @@ export type ServerResponse<T> =
   | { status: "clientError"; problems: Problem[] }
   | { status: "serverError" }
   | { status: "unauthorized" }
+  | { status: "notFound" }
   | never;
 
 export type LogoutConfig = {
@@ -124,6 +125,8 @@ export async function fetch<T>(
     }
 
     return { status: "unauthorized" };
+  } else if (response.status === 404) {
+    return { status: "notFound" };
   } else if (response.status >= 400 && response.status < 500) {
     const body = await response.json().catch((ex) => {
       console.warn(ex);
