@@ -38,11 +38,13 @@ impl ToHtml for FormCheckInput {
 
         let label_id = format!("{form}{id}/label");
         let input_id = format!("{form}{id}/input");
+        let error_id = format!("{form}{id}/error");
 
         Ok(format!(
             include_str!("check_input.html"),
             label_id = label_id,
             input_id = input_id,
+            error_id = error_id,
             label = label,
             required_marker = required_marker,
             required_attribute = required_attribute,
