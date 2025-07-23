@@ -16,7 +16,7 @@ use regex::Regex;
 
 use crate::htmplates::{
     Alert, Footer, FormAlert, FormCheckInput, FormSubmit, FormTextInput, Hr, HtmplateError, Icon,
-    Metadata, Title, replacer,
+    IconButton, Metadata, Title, replacer,
 };
 
 /// The details for an htmplate
@@ -51,6 +51,7 @@ pub fn all_htmplate_details() -> Vec<HtmplateDetails> {
         HtmplateDetails::new::<FormSubmit>(),
         HtmplateDetails::new::<Icon>(),
         HtmplateDetails::new::<Hr>(),
+        HtmplateDetails::new::<IconButton>(),
     ]
 }
 
@@ -98,6 +99,7 @@ pub fn replace_htmplates(html: &str, html_path: &Path) -> Result<String, Replace
                 element!(FormTextInput::tag(), |el| replacer::<FormTextInput>(el, html, html_path)),
                 element!(FormCheckInput::tag(), |el| replacer::<FormCheckInput>(el, html, html_path)),
                 element!(FormSubmit::tag(), |el| replacer::<FormSubmit>(el, html, html_path)),
+                element!(IconButton::tag(), |el| replacer::<IconButton>(el, html, html_path)),
                 not_found_handler,
             ],
             ..Settings::new()

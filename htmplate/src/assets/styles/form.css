@@ -47,8 +47,8 @@ input:invalid:not(:focus):not(:placeholder-shown) {
   outline: 2px solid var(--red);
 }
 
-:focus {
-  outline: 2px solid var(--mauve);
+:focus:not(:disabled) {
+  outline: 2px solid var(--mauve) !important;
 }
 
 :disabled {
@@ -90,37 +90,4 @@ input[type="checkbox"]:checked ~ svg {
 }
 input[type="checkbox"]:checked:disabled ~ svg {
   color: var(--surface1);
-}
-
-button {
-  height: 2rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-family: inherit;
-  font-size: 1rem;
-  color: var(--text);
-  cursor: pointer;
-
-  background-color: var(--base);
-  outline: 1px solid var(--overlay1);
-  border: none;
-  border-radius: var(--radius);
-}
-
-button:hover {
-  background-color: var(--surface1);
-}
-
-button:active {
-  background-color: var(--surface0);
-}
-
-button > svg {
-  height: 1.25rem;
-  margin-right: 0.5rem;
 }

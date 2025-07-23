@@ -6,6 +6,7 @@ mod footer;
 mod form;
 mod hr;
 mod icon;
+mod icon_button;
 mod metadata;
 mod title;
 
@@ -18,6 +19,7 @@ pub use footer::Footer;
 pub use form::{FormAlert, FormCheckInput, FormSubmit, FormTextInput};
 pub use hr::Hr;
 pub use icon::Icon;
+pub use icon_button::IconButton;
 pub use metadata::Metadata;
 pub use title::Title;
 
