@@ -39,11 +39,23 @@ pub struct Alert {
     pub status: AlertStyle,
     /// this should be the alert text
     pub text: Option<String>,
+    /// this should be if the alert starts collapsed
+    pub hidden: Option<bool>,
 }
 
 impl ToHtml for Alert {
     fn to_html(self) -> Result<String, HtmplateErrorKind> {
-        let Self { status, text } = self;
+        let Self {
+            status,
+            text,
+            hidden,
+        } = self;
+
+        let hidden = if hidden.is_some_and(|v| v) {
+            "collapse"
+        } else {
+            ""
+        };
 
         let icon = match &status {
             AlertStyle::Error => Icon::AlertCircle.svg(),
@@ -53,7 +65,7 @@ impl ToHtml for Alert {
             AlertStyle::Basic => Icon::InformationCircle.svg(),
         };
 
-        let class = match &status {
+        let style = match &status {
             AlertStyle::Error => "error",
             AlertStyle::Warning => "warning",
             AlertStyle::Success => "success",
@@ -63,9 +75,10 @@ impl ToHtml for Alert {
 
         let html = format!(
             include_str!("template.html"),
-            class = class,
+            style = style,
             icon = icon,
-            text = text.unwrap_or_default()
+            text = text.unwrap_or_default(),
+            hidden = hidden
         );
 
         Ok(html)
