@@ -41,6 +41,8 @@ pub fn replacer<T: HtmplateElement + ToHtml>(
 
     match htmplate.to_html() {
         Ok(html) => {
+            let html = inject_attributes_from_original_element(el, html);
+
             el.start_tag().remove();
             el.before(&html, ContentType::Html);
         }
@@ -59,6 +61,72 @@ pub fn replacer<T: HtmplateElement + ToHtml>(
     }
 
     Ok(())
+}
+
+fn inject_attributes_from_original_element(
+    el: &lol_html::html_content::Element,
+    mut html: String,
+) -> String {
+    create_or_replace("id", el, &mut html);
+    create_or_replace("aria-label", el, &mut html);
+
+    create_or_prepend("style", ";", el, &mut html);
+    create_or_prepend("class", " ", el, &mut html);
+
+    html
+}
+
+fn get_new_attribute_index(html: &str) -> usize {
+    let singleline_element_index = html.find("/>").unwrap_or(usize::MAX);
+    let element_index = html.find(">").unwrap_or_default();
+
+    if element_index < singleline_element_index {
+        element_index
+    } else {
+        singleline_element_index
+    }
+}
+
+fn create_or_prepend(
+    attribute: &str,
+    delimiter: &str,
+    el: &lol_html::html_content::Element,
+    html: &mut String,
+) {
+    let new_attribute_index = get_new_attribute_index(html);
+
+    if let Some(content) = el.get_attribute(attribute) {
+        if let Some(index) = html.find(&format!(r#"{attribute}=""#))
+            && index < new_attribute_index
+        {
+            let start = index + attribute.len() + 2;
+            html.insert_str(start, &format!("{content}{delimiter}"));
+        } else {
+            html.insert_str(
+                new_attribute_index,
+                &format!(r#" {attribute}="{content}" "#),
+            );
+        }
+    }
+}
+
+fn create_or_replace(attribute: &str, el: &lol_html::html_content::Element, html: &mut String) {
+    let new_attribute_index = get_new_attribute_index(html);
+
+    if let Some(content) = el.get_attribute(attribute) {
+        if let Some(index) = html.find(&format!(r#"{attribute}=""#))
+            && index < new_attribute_index
+        {
+            let start = index + attribute.len() + 2;
+            let end = html[start..].find("\"").unwrap() + start;
+            html.replace_range(start..end, &content);
+        } else {
+            html.insert_str(
+                new_attribute_index,
+                &format!(r#" {attribute}="{content}" "#),
+            );
+        }
+    }
 }
 
 /// Error type for replacing an htmplate.

@@ -13,26 +13,26 @@
         <form id="/register" name="register">
           <htmplate:form-alert form="/register" />
           <htmplate:form-text-input
-            id="/username"
+            input="/username"
             form="/register"
             label="Username"
             required="true"
             credential="true"
           />
           <htmplate:form-text-input
-            id="/displayName"
+            input="/displayName"
             form="/register"
             label="Display Name"
             required="true"
             credential="true"
           />
           <htmplate:form-check-input
-            id="/residentKey"
+            input="/residentKey"
             form="/register"
             label="Require resident key"
             required="true"
           />
-          <htmplate:form-submit form="/register" />
+          <htmplate:form-submit id="some-replacement" class="some-insertion" form="/register" />
         </form>
         <htmplate:hr text="horizontal divider" />
         <button id="redirect">Redirect</button>
@@ -96,8 +96,8 @@
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap">
           <htmplate:icon-button icon="add" text="Add something" />
           <htmplate:icon-button icon="add" text="Add something" href="#" />
-          <htmplate:icon-button icon="add" text="Add something" ghost="true" />
-          <htmplate:icon-button icon="add" ghost="true" />
+          <htmplate:icon-button icon="add" text="Add something" class="ghost" />
+          <htmplate:icon-button icon="add" class="ghost" />
           <htmplate:icon-button icon="add" />
         </div>
       </div>

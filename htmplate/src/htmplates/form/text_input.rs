@@ -9,7 +9,7 @@ use crate::{
 /// a text input for a form
 pub struct FormTextInput {
     /// this should be the id of the input, must start with a `/`
-    pub id: FormId,
+    pub input: FormId,
     /// this should be the id of the form, must start with a `/`
     pub form: FormId,
     /// this should be the input label contents
@@ -23,7 +23,7 @@ pub struct FormTextInput {
 impl ToHtml for FormTextInput {
     fn to_html(self) -> Result<String, HtmplateErrorKind> {
         let Self {
-            id: FormId(id),
+            input: FormId(id),
             form: FormId(form),
             required,
             label,
