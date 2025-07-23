@@ -10,6 +10,7 @@ use notify::{EventKind, RecursiveMode, Watcher, recommended_watcher};
 use ts_cli_helper::print_success;
 use ts_rust_helper::{
     error::{ErrorStackStyle, IntoErrorReport},
+    path::RelativePath,
     style::*,
 };
 
@@ -185,7 +186,7 @@ fn display_tracked_files(map: &HashMap<PathBuf, FileStatus>) -> io::Result<()> {
             stdout.write_all(
                 format!(
                     "{BOLD}{RED}Failure{RESET}{BOLD}:{RESET} `{}` {}\n",
-                    display_path(path),
+                    path.relative_to_current_dir().opinionated_display(),
                     status
                 )
                 .as_bytes(),
@@ -194,7 +195,7 @@ fn display_tracked_files(map: &HashMap<PathBuf, FileStatus>) -> io::Result<()> {
             stdout.write_all(
                 format!(
                     "{BOLD}{GREEN}Success{RESET}{BOLD}:{RESET} `{}` {}\n",
-                    display_path(path),
+                    path.relative_to_current_dir().opinionated_display(),
                     status
                 )
                 .as_bytes(),
@@ -206,11 +207,6 @@ fn display_tracked_files(map: &HashMap<PathBuf, FileStatus>) -> io::Result<()> {
     stdout.flush()?;
 
     Ok(())
-}
-
-pub fn display_path(path: &Path) -> String {
-    let path = path.canonicalize().unwrap_or_else(|_| path.to_path_buf());
-    path.to_string_lossy().replace("\\\\?\\", "")
 }
 
 /// Error variants for watching a directory.

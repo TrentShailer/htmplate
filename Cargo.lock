@@ -272,16 +272,17 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
 name = "htmplate"
-version = "0.9.0"
+version = "0.10.1"
 dependencies = [
  "htmplate-derive",
  "lol_html",
  "regex",
+ "ts-rust-helper 0.9.1",
 ]
 
 [[package]]
 name = "htmplate-cli"
-version = "0.9.0"
+version = "0.10.1"
 dependencies = [
  "clap",
  "htmplate",
@@ -289,12 +290,12 @@ dependencies = [
  "notify",
  "simple_logger",
  "ts-cli-helper",
- "ts-rust-helper",
+ "ts-rust-helper 0.9.1",
 ]
 
 [[package]]
 name = "htmplate-derive"
-version = "0.9.0"
+version = "0.10.1"
 dependencies = [
  "convert_case",
  "htmplate",
@@ -682,7 +683,7 @@ checksum = "456095d7ab50815e5e1a5078a5db6728027549c2f844e7bb926f82a3aab6ce47"
 dependencies = [
  "convert_case",
  "regex",
- "ts-rust-helper",
+ "ts-rust-helper 0.7.1",
 ]
 
 [[package]]
@@ -690,6 +691,12 @@ name = "ts-rust-helper"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "129bb493daebab4cd849ae7bc3114ad1311cf31bacb3700ae2bea037d44759cb"
+
+[[package]]
+name = "ts-rust-helper"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "296b3b025eef6a69faaca47d489660e0ca7a68310bfbef9740233fc0c79bbc3b"
 
 [[package]]
 name = "unicode-ident"
