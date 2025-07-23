@@ -108,6 +108,11 @@ aside {
   height: 2.5rem;
 }
 
+small {
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
 a {
   border-radius: var(--radius);
   color: var(--blue);
