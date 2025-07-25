@@ -8,6 +8,7 @@ const BASE64_TS: &str = include_str!(concat!(env!("OUT_DIR"), "/base64.ts"));
 const FETCH_TS: &str = include_str!(concat!(env!("OUT_DIR"), "/fetch.ts"));
 const FORM_TS: &str = include_str!(concat!(env!("OUT_DIR"), "/form.ts"));
 const REDIRECT_TS: &str = include_str!(concat!(env!("OUT_DIR"), "/redirect.ts"));
+const TEMPORAL_TS: &str = include_str!(concat!(env!("OUT_DIR"), "/temporal.ts"));
 
 const FAVICON: &[u8] = include_bytes!("assets/favicon.ico");
 
@@ -37,6 +38,7 @@ pub fn write_assets(directory: &Path) -> io::Result<()> {
     fs::write(directory.join("fetch.ts"), FETCH_TS)?;
     fs::write(directory.join("form.ts"), FORM_TS)?;
     fs::write(directory.join("redirect.ts"), REDIRECT_TS)?;
+    fs::write(directory.join("temporal.ts"), TEMPORAL_TS)?;
 
     // Write static
     fs::write(directory.join("favicon.ico"), FAVICON)?;

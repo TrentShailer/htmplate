@@ -1,5 +1,6 @@
 import { setHref } from "./lib/redirect.ts";
 import { Form } from "./lib/form.ts";
+import { Temporal } from "./lib/temporal.ts";
 
 const register = new Form("/register", ["/username", "/displayName"]);
 
@@ -39,3 +40,4 @@ if (redirect) {
     console.log("Shouldn't execute");
   });
 }
+console.log(Temporal.Now);
