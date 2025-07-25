@@ -1,7 +1,7 @@
 use htmplate_derive::HtmplateElement;
 
 use crate::{
-    htmplates::{HtmplateErrorKind, ToHtml},
+    htmplates::{HtmplateErrorKind, ToHtml, create_or_prepend_html_attribute},
     icon::Icon,
 };
 
@@ -18,7 +18,12 @@ pub struct Title {
 
 impl ToHtml for Title {
     fn to_html(self) -> Result<String, HtmplateErrorKind> {
-        let icon = self.icon.map(|icon| icon.svg()).unwrap_or_default();
+        let mut icon = self
+            .icon
+            .map(|icon| icon.svg())
+            .unwrap_or_default()
+            .to_string();
+        create_or_prepend_html_attribute("class", "mauve", " ", &mut icon);
         let text = self.text.unwrap_or_default();
 
         let content = format!(include_str!("template.html"), icon = icon, text = text);

@@ -1,8 +1,12 @@
-use std::{fs, io, path::Path, process::Stdio};
+use std::{
+    io::{self},
+    path::Path,
+    process::Stdio,
+};
 
 use crate::actions::file_exists_and_is_accessable;
 
-pub fn bundle_script(source: &Path, target: &Path) -> Result<(), BundleScriptError> {
+pub fn bundle_script(source: &Path) -> Result<(), BundleScriptError> {
     // Ensure deno exists.
     if std::process::Command::new("deno")
         .arg("--version")
@@ -25,8 +29,11 @@ pub fn bundle_script(source: &Path, target: &Path) -> Result<(), BundleScriptErr
         .arg("--platform")
         .arg("browser")
         .arg("--minify")
+        .arg("--sourcemap")
+        .arg("--outdir")
+        .arg(source.parent().unwrap())
         .arg(source)
-        .stdout(Stdio::piped())
+        .stdout(Stdio::null())
         .stdin(Stdio::null())
         .stderr(Stdio::piped())
         .spawn()
@@ -45,18 +52,6 @@ pub fn bundle_script(source: &Path, target: &Path) -> Result<(), BundleScriptErr
             status: status.code().unwrap_or(i32::MIN),
         });
     }
-
-    let stdout = io::read_to_string(child.stdout.take().unwrap())
-        .map_err(|source| BundleScriptError::ReadBundlerOutput { source })?;
-    const HEADERS: [&str; 3] = [
-        "// deno-lint-ignore-file",
-        "// deno-fmt-ignore-file",
-        "// @ts-nocheck",
-    ];
-    let header = HEADERS.join("\n");
-
-    let output: String = [header, stdout].join("\n");
-    fs::write(target, output).map_err(|source| BundleScriptError::WriteBundle { source })?;
 
     Ok(())
 }
@@ -83,9 +78,6 @@ pub enum BundleScriptError {
 
     #[non_exhaustive]
     ReadBundlerOutput { source: io::Error },
-
-    #[non_exhaustive]
-    WriteBundle { source: io::Error },
 }
 impl core::fmt::Display for BundleScriptError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -96,7 +88,6 @@ impl core::fmt::Display for BundleScriptError {
                 write!(f, "the bundler process exited with code {status}: {stderr}")
             }
             Self::ReadBundlerOutput { .. } => write!(f, "could not read the bundler output"),
-            Self::WriteBundle { .. } => write!(f, "failed to write bundled script"),
             Self::ReadSourceMetadata { .. } => write!(f, "could not read source file metadata"),
             Self::CannotAccessSource { .. } => {
                 write!(f, "source file does not exist or is inaccessable")
@@ -109,7 +100,6 @@ impl core::error::Error for BundleScriptError {
         match &self {
             Self::SpawnBundlerProcess { source, .. } => Some(source),
             Self::ReadBundlerOutput { source, .. } => Some(source),
-            Self::WriteBundle { source, .. } => Some(source),
             Self::ReadSourceMetadata { source, .. } => Some(source),
             _ => None,
         }

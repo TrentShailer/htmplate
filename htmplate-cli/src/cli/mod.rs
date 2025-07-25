@@ -59,9 +59,6 @@ pub enum Command {
         /// The path to the TypeScript file to bundle.
         source: PathBuf,
 
-        /// The file to output the bundled JavaScript to.
-        target: PathBuf,
-
         /// Enable verbose debug output
         #[arg(long)]
         verbose: bool,
@@ -98,18 +95,13 @@ impl Command {
                 write_library(&asset_directory).map_err(|source| CommandError::Assets { source })?
             }
 
-            Self::Bundle {
-                source,
-                target,
-                verbose,
-            } => {
+            Self::Bundle { source, verbose } => {
                 if verbose {
                     simple_logger::init_with_level(Level::Debug)
                         .map_err(|source| CommandError::SetupLogger { source })?;
                 }
 
-                bundle_script(&source, &target)
-                    .map_err(|source| CommandError::Bundle { source })?;
+                bundle_script(&source).map_err(|source| CommandError::Bundle { source })?;
             }
 
             Self::Watch { root, verbose } => {

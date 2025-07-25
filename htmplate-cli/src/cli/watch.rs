@@ -89,8 +89,7 @@ fn handle_file(path: &Path, status_map: &mut HashMap<PathBuf, FileStatus>) {
             );
         }
     } else if path.ends_with("index.ts") {
-        let target = &path.with_file_name("index.js");
-        let result = bundle_script(&path, target);
+        let result = bundle_script(&path);
 
         if let Some(status) = status_map.get_mut(&path) {
             status.event_count += 1;

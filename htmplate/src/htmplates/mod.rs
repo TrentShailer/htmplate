@@ -67,11 +67,19 @@ fn inject_attributes_from_original_element(
     el: &lol_html::html_content::Element,
     mut html: String,
 ) -> String {
-    create_or_replace("id", el, &mut html);
-    create_or_replace("aria-label", el, &mut html);
+    if let Some(content) = el.get_attribute("id") {
+        create_or_replace_html_attribute("id", &content, &mut html);
+    }
+    if let Some(content) = el.get_attribute("aria-label") {
+        create_or_replace_html_attribute("aria-label", &content, &mut html);
+    }
 
-    create_or_prepend("style", ";", el, &mut html);
-    create_or_prepend("class", " ", el, &mut html);
+    if let Some(content) = el.get_attribute("style") {
+        create_or_prepend_html_attribute("style", &content, ";", &mut html);
+    }
+    if let Some(content) = el.get_attribute("class") {
+        create_or_prepend_html_attribute("class", &content, " ", &mut html);
+    }
 
     html
 }
@@ -87,45 +95,41 @@ fn get_new_attribute_index(html: &str) -> usize {
     }
 }
 
-fn create_or_prepend(
+/// Create or prepend to an attribute in some HTML
+pub fn create_or_prepend_html_attribute(
     attribute: &str,
+    content: &str,
     delimiter: &str,
-    el: &lol_html::html_content::Element,
     html: &mut String,
 ) {
     let new_attribute_index = get_new_attribute_index(html);
-
-    if let Some(content) = el.get_attribute(attribute) {
-        if let Some(index) = html.find(&format!(r#"{attribute}=""#))
-            && index < new_attribute_index
-        {
-            let start = index + attribute.len() + 2;
-            html.insert_str(start, &format!("{content}{delimiter}"));
-        } else {
-            html.insert_str(
-                new_attribute_index,
-                &format!(r#" {attribute}="{content}" "#),
-            );
-        }
+    if let Some(index) = html.find(&format!(r#"{attribute}=""#))
+        && index < new_attribute_index
+    {
+        let start = index + attribute.len() + 2;
+        html.insert_str(start, &format!("{content}{delimiter}"));
+    } else {
+        html.insert_str(
+            new_attribute_index,
+            &format!(r#" {attribute}="{content}" "#),
+        );
     }
 }
 
-fn create_or_replace(attribute: &str, el: &lol_html::html_content::Element, html: &mut String) {
+/// Create or replace an attribute in some HTML
+pub fn create_or_replace_html_attribute(attribute: &str, content: &str, html: &mut String) {
     let new_attribute_index = get_new_attribute_index(html);
-
-    if let Some(content) = el.get_attribute(attribute) {
-        if let Some(index) = html.find(&format!(r#"{attribute}=""#))
-            && index < new_attribute_index
-        {
-            let start = index + attribute.len() + 2;
-            let end = html[start..].find("\"").unwrap() + start;
-            html.replace_range(start..end, &content);
-        } else {
-            html.insert_str(
-                new_attribute_index,
-                &format!(r#" {attribute}="{content}" "#),
-            );
-        }
+    if let Some(index) = html.find(&format!(r#"{attribute}=""#))
+        && index < new_attribute_index
+    {
+        let start = index + attribute.len() + 2;
+        let end = html[start..].find("\"").unwrap() + start;
+        html.replace_range(start..end, content);
+    } else {
+        html.insert_str(
+            new_attribute_index,
+            &format!(r#" {attribute}="{content}" "#),
+        );
     }
 }
 
