@@ -1,16 +1,14 @@
 import { setHref } from "./redirect.ts";
 
 export type Problem = {
-  pointer: string | null;
-  detail: string | null;
+  pointer: string;
+  detail: string;
 };
 
 export type ServerResponse<T> =
   | { status: "ok"; body: T }
   | { status: "clientError"; problems: Problem[] }
-  | { status: "serverError" }
-  | { status: "unauthorized" }
-  | { status: "notFound" }
+  | { status: "somethingWentWrong" }
   | never;
 
 export type LogoutConfig = {
@@ -85,7 +83,7 @@ export async function fetch<T>(
   }
 
   const token = localStorage.getItem(TOKEN_KEY);
-  if (token) {
+  if (token && !headers.has("Authorization")) {
     headers.append("Authorization", token);
   }
 
@@ -118,30 +116,29 @@ export async function fetch<T>(
       status: "ok",
       body,
     };
-  } else if (response.status === 401) {
-    if (logoutConfig) {
-      await logout(
-        logoutConfig,
-        logoutShouldReturn,
-      );
-    }
-
-    return { status: "unauthorized" };
-  } else if (response.status === 404) {
-    return { status: "notFound" };
-  } else if (response.status >= 400 && response.status < 500) {
-    const body = await response.json().catch((ex) => {
-      console.warn(ex);
-      return { problems: [] };
-    });
-
-    return {
-      status: "clientError",
-      problems: body.problems ?? [],
-    };
-  } else {
-    return { status: "serverError" };
   }
+
+  switch (response.status) {
+    case 400: {
+      const body = await response.json().catch((ex) => {
+        console.warn(ex);
+        return { problems: [] };
+      });
+
+      return {
+        status: "clientError",
+        problems: body.problems ?? [],
+      };
+    }
+    case 401: {
+      if (logoutConfig) {
+        await logout(logoutConfig, logoutShouldReturn);
+      }
+      break;
+    }
+  }
+
+  return { status: "somethingWentWrong" };
 }
 
 export async function logout(

@@ -2,12 +2,12 @@ import { setHref } from "./lib/redirect.ts";
 import { Form } from "./lib/form.ts";
 import { Temporal } from "./lib/temporal.ts";
 
-const register = new Form("/register", ["/username", "/displayName"]);
+const register = new Form("/register", ["/username", "/displayName"], "register");
 
 register.form.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  register.lock();
+  register.setLock(true);
   register.clearErrors();
   const values = register.getValues();
 
@@ -22,14 +22,10 @@ register.form.addEventListener("submit", (event) => {
       { pointer: "/displayName", detail: "too short" },
       { pointer: "/displayName", detail: "contains illegal character" },
       { pointer: "/authorization", detail: "unauthorized" },
-      { pointer: null, detail: "internal server error" },
-      { pointer: "/username", detail: null },
-      { pointer: null, detail: null },
-      { pointer: null, detail: null },
     ];
 
     register.setInputErrors(problems);
-    register.unlock();
+    register.setLock(false);
   }, 1000);
 });
 
