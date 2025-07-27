@@ -111,7 +111,8 @@ export async function fetch<T>(
         problems: body.problems ?? [],
       };
     }
-    case 401: {
+    case 401:
+    case 403: {
       return { status: "unauthenticated" };
     }
   }
