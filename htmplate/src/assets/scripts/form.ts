@@ -28,7 +28,7 @@ export class FormError {
     this.contents.textContent += `, ${error}`;
   }
 
-  setSomethingWentWrong() {
+  panic() {
     this.element.classList.remove("collapse");
     this.element.ariaHidden = "false";
     this.contents.textContent =
