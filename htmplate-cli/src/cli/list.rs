@@ -1,15 +1,23 @@
 use std::io::{self, Write, stdout};
 
+use argh::FromArgs;
 use htmplate::{HtmplateDetails, all_htmplate_details};
-use ts_rust_helper::style::*;
+use ts_ansi::style::*;
 
-use crate::cli::Command;
+/// List the htmplate elements.
+#[derive(Debug, FromArgs)]
+#[argh(subcommand, name = "list")]
+pub struct ListSubcommand {
+    /// search string for a specific htmplate element
+    #[argh(positional)]
+    search: Option<String>,
+}
 
-impl Command {
-    pub fn print_templates(search: Option<&str>) -> io::Result<()> {
+impl ListSubcommand {
+    pub fn print_templates(&self) -> io::Result<()> {
         let mut htmplates = all_htmplate_details();
 
-        if let Some(search) = search {
+        if let Some(search) = self.search.as_ref() {
             let search = search.to_lowercase();
             htmplates.retain(|htmplate| htmplate.tag.contains(&search));
         }

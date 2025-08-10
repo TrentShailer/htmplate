@@ -1,119 +1,56 @@
-use std::{io, path::PathBuf};
+use std::io;
 
-use clap::{Parser, Subcommand};
-use log::Level;
+use argh::FromArgs;
 
 use crate::{
-    actions::{
-        BundleScriptError, TemplateError, WriteLibraryError, bundle_script, template_html,
-        write_library,
+    actions::{BundleScriptError, TemplateError, WriteLibraryError},
+    cli::{
+        assets::AssetsSubcommand,
+        bundle::BundleSubcommand,
+        list::ListSubcommand,
+        template::TemplateSubcommand,
+        watch::{WatchError, WatchSubcommand},
     },
-    cli::watch::{WatchError, watch},
 };
 
+mod assets;
+mod bundle;
 mod list;
+mod template;
 mod watch;
 
-/// Replace the `<htmplate:... />` elements in an HTML file with their contents.
-#[derive(Debug, Parser)]
+/// Template `<htmplate:... />` elements in HTML.
+#[derive(Debug, FromArgs)]
 pub struct Cli {
-    /// Subcommand
-    #[clap(subcommand)]
+    /// what subcommand to run
+    #[argh(subcommand)]
     pub command: Command,
 }
 
 /// Subcommand
-#[derive(Debug, Subcommand)]
+#[derive(Debug, FromArgs)]
+#[argh(subcommand)]
 pub enum Command {
-    /// Watch a file and template it whenever it is modified.
-    Watch {
-        /// The path to watch for changes to `index.template.html` file changes.
-        root: PathBuf,
-
-        /// Enable verbose debug output
-        #[arg(long)]
-        verbose: bool,
-    },
-
-    /// Template a file
-    Template {
-        /// The path to the HTML file containing htmplates.
-        source: PathBuf,
-
-        /// The file to output the templated HTML to.
-        target: PathBuf,
-
-        /// Enable verbose debug output
-        #[arg(long)]
-        verbose: bool,
-    },
-
-    /// Write the assets out
-    Assets {
-        /// The directory to write the assets to.
-        asset_directory: PathBuf,
-    },
-
-    /// Bundle the TypeScript
-    Bundle {
-        /// The path to the TypeScript file to bundle.
-        source: PathBuf,
-
-        /// Enable verbose debug output
-        #[arg(long)]
-        verbose: bool,
-    },
-
-    /// List the htmplates
-    List {
-        /// The htmplate to search for
-        search: Option<String>,
-    },
+    Watch(WatchSubcommand),
+    Template(TemplateSubcommand),
+    Assets(AssetsSubcommand),
+    Bundle(BundleSubcommand),
+    List(ListSubcommand),
 }
 
 impl Command {
     pub fn execute(self) -> Result<(), CommandError> {
         match self {
-            Self::List { search } => Self::print_templates(search.as_deref())
-                .map_err(|source| CommandError::List { source })?,
-
-            Self::Template {
-                source,
-                target,
-                verbose,
-            } => {
-                if verbose {
-                    simple_logger::init_with_level(Level::Debug)
-                        .map_err(|source| CommandError::SetupLogger { source })?;
-                }
-
-                template_html(&source, &target)
-                    .map_err(|source| CommandError::Template { source })?;
-            }
-
-            Self::Assets { asset_directory } => {
-                write_library(&asset_directory).map_err(|source| CommandError::Assets { source })?
-            }
-
-            Self::Bundle { source, verbose } => {
-                if verbose {
-                    simple_logger::init_with_level(Level::Debug)
-                        .map_err(|source| CommandError::SetupLogger { source })?;
-                }
-
-                bundle_script(&source).map_err(|source| CommandError::Bundle { source })?;
-            }
-
-            Self::Watch { root, verbose } => {
-                if verbose {
-                    simple_logger::init_with_level(Level::Debug)
-                        .map_err(|source| CommandError::SetupLogger { source })?;
-                }
-                watch(&root).map_err(|source| CommandError::Watch { source })?
-            }
+            Self::List(subcommand) => subcommand
+                .print_templates()
+                .map_err(|source| CommandError::List { source }),
+            Self::Template(subcommand) => subcommand.template(),
+            Self::Assets(subcommand) => subcommand.write_assets(),
+            Self::Bundle(subcommand) => subcommand.bundle(),
+            Self::Watch(subcommand) => subcommand
+                .watch()
+                .map_err(|source| CommandError::Watch { source }),
         }
-
-        Ok(())
     }
 }
 
@@ -136,9 +73,6 @@ pub enum CommandError {
 
     #[non_exhaustive]
     Watch { source: WatchError },
-
-    #[non_exhaustive]
-    SetupLogger { source: log::SetLoggerError },
 }
 impl core::fmt::Display for CommandError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -147,7 +81,6 @@ impl core::fmt::Display for CommandError {
             Self::Assets { .. } => write!(f, "writing assets failed"),
             Self::Template { .. } => write!(f, "templating HTML failed"),
             Self::Watch { .. } => write!(f, "failed while watching"),
-            Self::SetupLogger { .. } => write!(f, "failed to create logger"),
             Self::Bundle { .. } => write!(f, "failed to bundle script"),
         }
     }
@@ -159,7 +92,6 @@ impl core::error::Error for CommandError {
             Self::Assets { source, .. } => Some(source),
             Self::Template { source, .. } => Some(source),
             Self::Watch { source, .. } => Some(source),
-            Self::SetupLogger { source, .. } => Some(source),
             Self::Bundle { source, .. } => Some(source),
         }
     }

@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use ts_rust_helper::path::RelativePath;
+use ts_path::{DisplayPath, RelativePath};
 
 /// A trait marking a struct as an htmplate.
 pub trait HtmplateElement: Sized {
@@ -64,7 +64,7 @@ impl Location {
         }
 
         Self {
-            path: path.relative_to_current_dir().opinionated_display(),
+            path: path.relative_to_cwd().opinionated_display(),
             line,
             column,
         }

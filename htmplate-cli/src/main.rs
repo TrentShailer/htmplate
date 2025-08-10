@@ -1,16 +1,15 @@
 //! # `htmplate-cli`
 //!
 
-use clap::Parser;
-use ts_rust_helper::error::ReportProgramExit;
+use ts_error::ReportProgramExit;
 
 use crate::cli::Cli;
 
-mod cli;
 mod actions;
+mod cli;
 
 fn main() -> ReportProgramExit {
-    let cli = Cli::parse();
+    let cli: Cli = argh::from_env();
 
     cli.command.execute()?;
 
